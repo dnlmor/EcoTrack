@@ -2,6 +2,7 @@ from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 from app.config import JWT_SECRET_KEY
+from typing import Set
 
 # Password Hashing Context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -9,6 +10,9 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # Constants
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+# In-memory blacklist for tokens
+blacklisted_tokens: Set[str] = set()
 
 # Password Hashing Functions
 def hash_password(password: str) -> str:
@@ -29,8 +33,14 @@ def create_access_token(data: dict, expires_delta: timedelta = None) -> str:
 
 # JWT Token Validation
 def verify_access_token(token: str) -> dict:
+    if token in blacklisted_tokens:
+        return None  # Token is blacklisted, treat as invalid
     try:
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
         return payload
     except JWTError:
         return None
+
+# Blacklist a token
+def blacklist_token(token: str):
+    blacklisted_tokens.add(token)

@@ -1,7 +1,13 @@
 from sqlalchemy.orm import Session
 from app.models import User
 from app.schemas import UserCreate
-from app.utils.token_utils import hash_password, verify_password, create_access_token
+from app.utils.token_utils import (
+    hash_password,
+    verify_password,
+    create_access_token,
+    verify_access_token,
+    blacklist_token,
+)
 from fastapi import HTTPException, status
 
 # Register a New User
@@ -44,3 +50,14 @@ def generate_user_token(user):
     
     token = create_access_token(token_data)
     return {"access_token": token, "token_type": "bearer"}
+
+# Logout User
+def logout_user(token: str, db: Session):
+    payload = verify_access_token(token)
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token"
+        )
+    # Blacklist the token
+    blacklist_token(token)

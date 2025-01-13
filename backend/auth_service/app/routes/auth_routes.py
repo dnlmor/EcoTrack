@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.schemas import UserCreate, UserLogin, Token, UserResponse
 from app.config import get_db
-from app.services.auth_service import register_user, authenticate_user, generate_user_token
+from app.services.auth_service import register_user, authenticate_user, generate_user_token, logout_user
 
 router = APIRouter()
 
@@ -16,3 +16,9 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 def login(user: UserLogin, db: Session = Depends(get_db)):
     authenticated_user = authenticate_user(user.email, user.password, db)
     return generate_user_token(authenticated_user)
+
+# Logout Endpoint
+@router.post("/logout", status_code=status.HTTP_200_OK)
+def logout(token: str, db: Session = Depends(get_db)):
+    logout_user(token, db)
+    return {"detail": "Logout successful"}
