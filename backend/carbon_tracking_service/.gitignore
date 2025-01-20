@@ -1,0 +1,9 @@
+# Ignore pytest cache
+.pytest_cache/
+
+# Ignore Python bytecode caches
+__pycache__/
+*.py[cod]
+
+# Ignore environment files
+.env
