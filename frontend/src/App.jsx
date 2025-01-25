@@ -9,6 +9,7 @@ import StatsDashboard from "./pages/StatsDashboard";
 import CarbonTrackingPage from "./pages/CarbonTrackingPage";
 import PrivateRoute from "./components/PrivateRoute";
 import Navigation from "./components/Navigation";
+import Home from "./pages/Home";
 
 function App() {
   return (
@@ -18,6 +19,8 @@ function App() {
           <Navigation />
           <Routes>
             {/* Public Routes */}
+
+            <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 
@@ -25,25 +28,25 @@ function App() {
             <Route
               path="/dashboard"
               element={
-                <PrivateRoute>
+
                   <Dashboard />
-                </PrivateRoute>
+  
               }
             />
             <Route
               path="/stats-dashboard"
               element={
-                <PrivateRoute>
+      
                   <StatsDashboard />
-                </PrivateRoute>
+                
               }
             />
             <Route
               path="/carbon-tracking"
               element={
-                <PrivateRoute>
+              
                   <CarbonTrackingPage />
-                </PrivateRoute>
+                
               }
             />
           </Routes>

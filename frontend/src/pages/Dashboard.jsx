@@ -6,20 +6,20 @@ const Dashboard = () => {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-green-50">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-gray-800">
-          Welcome, {user?.username || "User"}!
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+      <div className="container mx-auto px-4 py-16 text-center">
+        <h1 className="text-5xl font-bold text-green-800 mb-6">
+          Welcome, {user?.username || "User"} 🌿
         </h1>
-        <p className="text-gray-600 mt-4 text-lg">
-          Ready to track your carbon footprint and make a difference?
+        <p className="text-xl text-green-700 mb-12">
+          Ready to reduce your carbon footprint and make Earth happier? 🌍
         </p>
-        <div className="mt-8 space-x-4">
+        <div className="space-y-6">
           <Link
             to="/stats-dashboard"
-            className="px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700"
+            className="block max-w-md mx-auto px-8 py-4 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors shadow-lg"
           >
-            View Stats & Start Tracking
+            Start Tracking Your Impact 📊
           </Link>
         </div>
       </div>

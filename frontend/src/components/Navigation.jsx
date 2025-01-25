@@ -6,20 +6,20 @@ const Navigation = () => {
   const { user, logout } = useAuth();
 
   return (
-    <nav className="bg-gray-800 text-white p-4 flex justify-between">
-      <h1 className="text-xl">EcoTrack</h1>
-      <div>
+    <nav className="bg-green-700 text-white p-4 flex justify-between items-center">
+      <h1 className="text-2xl font-bold">EcoTrack 🌱</h1>
+      <div className="space-x-4">
         {!user ? (
           <>
-            <Link to="/login" className="mx-2">
+            <Link to="/login" className="hover:text-green-200 transition-colors">
               Login
             </Link>
-            <Link to="/register" className="mx-2">
+            <Link to="/register" className="bg-white text-green-700 px-4 py-2 rounded-lg hover:bg-green-50">
               Register
             </Link>
           </>
         ) : (
-          <button onClick={logout} className="mx-2">
+          <button onClick={logout} className="hover:text-green-200 transition-colors">
             Logout
           </button>
         )}
