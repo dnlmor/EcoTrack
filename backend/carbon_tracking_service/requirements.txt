@@ -1,7 +1,7 @@
 fastapi
 uvicorn
 SQLAlchemy
-psycopg2
+psycopg2-binary
 pydantic
 jose
 python-jose
