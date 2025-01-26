@@ -4,6 +4,7 @@ SQLAlchemy
 psycopg2
 pydantic
 jose
+python-jose
 python-dotenv
 openai
 pytest

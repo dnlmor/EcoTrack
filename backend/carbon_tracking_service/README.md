@@ -15,7 +15,6 @@
     │   │   │   ├── ai_service.py                 # AI-based interaction logic (OpenAI integration)
     │   │   ├── utils/                            # Helper functions for calculations and utilities
     │   │   │   ├── __init__.py
-    │   │   │   ├── tracking_utils.py             # Functions for carbon footprint calculations
     │   │   │   ├── token_utils.py                # JWT-related utilities
     │   │   ├── config.py                         # Configuration settings, database connection setup
     │   │   ├── dependencies.py                   # Dependency injection for database sessions, etc.

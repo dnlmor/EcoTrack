@@ -1,6 +1,6 @@
-import os
-from openai import OpenAI
 from app.config import settings
+from openai import OpenAI
+from app.services.carbon_service import calculate_carbon_footprint
 
 # Initialize the OpenAI client
 client = OpenAI(api_key=settings.openai_api_key)
@@ -8,75 +8,61 @@ client = OpenAI(api_key=settings.openai_api_key)
 
 def chat_with_sustainability_consultant(prompt: str) -> str:
     """
-    Interact with the ChatGPT model to simulate a sustainability consultant.
+    Interact with the AI model to simulate a professional sustainability consultant.
     """
     try:
-        chat_completion = client.chat.completions.create(
+        response = client.chat.completions.create(
             messages=[
                 {"role": "system", "content": "You are a professional sustainability consultant."},
-                {"role": "user", "content": prompt}
+                {"role": "user", "content": prompt},
             ],
-            model="gpt-4o",
+            model="gpt-4",
         )
-        # Extract response content properly
-        if chat_completion.choices and len(chat_completion.choices) > 0:
-            return chat_completion.choices[0].message.content.strip()
-        else:
-            raise Exception("No choices found in the response.")
+        return response.choices[0].message.content.strip()
     except Exception as e:
         raise Exception(f"Error communicating with OpenAI API: {str(e)}")
 
 
 def generate_tailored_carbon_footprint_questions() -> list:
     """
-    Generate detailed, tailored carbon footprint questions for the user.
-    Returns questions grouped by categories for better structure.
+    Generate specific and concise questions for assessing the user's carbon footprint.
     """
     prompt = """
-    Generate specific and concise questions for assessing the user's carbon footprint.
-    Group the questions under these categories: Home Energy, Travel, Diet, Waste, and Additional Information.
-    Each question should be on a new line. Do not add additional descriptions or explanations.
+    Create tailored questions to gather information about a user's carbon footprint. 
+    Group questions into categories: Home Energy, Transportation, Diet, and Waste. Ensure conciseness and clarity.
     """
     response = chat_with_sustainability_consultant(prompt)
+    return response.split("\n")  # Return questions as a list of strings
 
-    # Split the response into structured categories
-    questions = {
-        "home_energy": [],
-        "travel": [],
-        "diet": [],
-        "waste": [],
-        "additional_information": [],
+
+def process_user_answers_and_generate_result(user_answers: dict) -> dict:
+    """
+    Process the user's answers, calculate their carbon footprint, and return the results.
+
+    Args:
+        user_answers (dict): User-provided answers to carbon footprint questions.
+
+    Returns:
+        dict: A dictionary containing the carbon footprint breakdown and total.
+    """
+    emissions = calculate_carbon_footprint(user_answers)
+    if emissions.get("total", 0) < 0:
+        raise ValueError("Invalid carbon footprint calculation. Total emissions cannot be negative.")
+    return emissions
+
+
+def generate_critique_and_tips(carbon_footprint: float) -> dict:
+    """
+    Provide concise critique and actionable tips based on the user's carbon footprint.
+    """
+    critique = (
+        "Your carbon footprint is below average. Great job!" if carbon_footprint < 1000
+        else "Your carbon footprint is above average. Focus on reducing high-impact areas."
+    )
+    tips = {
+        "home_energy": "Use energy-efficient appliances and consider renewable energy.",
+        "transportation": "Carpool, use public transport, or switch to electric vehicles.",
+        "diet": "Reduce meat consumption and embrace plant-based meals.",
+        "waste": "Recycle more and reduce single-use plastics."
     }
-    category_map = {
-        "home_energy": "Home Energy",
-        "travel": "Travel",
-        "diet": "Diet",
-        "waste": "Waste",
-        "additional_information": "Additional Information",
-    }
-
-    current_category = None  # Track the current category
-
-    for line in response.splitlines():
-        for category, header in category_map.items():
-            if line.startswith(header):
-                current_category = category
-            elif line.strip() and current_category:
-                # Avoid duplicates in each category
-                if line.strip() not in questions[current_category]:
-                    questions[current_category].append(line.strip())
-
-    return questions
-
-
-def generate_critique_and_tips(carbon_footprint: float) -> str:
-    """
-    Provide professional critique and sustainability tips based on the calculated footprint.
-    """
-    prompt = f"""
-    A user has a carbon footprint of {carbon_footprint:.2f} kg CO2. As a professional sustainability consultant:
-    1. Critique the result, explaining which areas contribute the most.
-    2. Provide actionable tips for reducing emissions, addressing each key area: Home Energy, Travel, Diet, Waste, and Lifestyle.
-    Be concise and clear in your response.
-    """
-    return chat_with_sustainability_consultant(prompt)
+    return {"critique": critique, "tips": tips}
