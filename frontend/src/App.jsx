@@ -10,6 +10,9 @@ import CarbonTrackingPage from "./pages/CarbonTrackingPage";
 import PrivateRoute from "./components/PrivateRoute";
 import Navigation from "./components/Navigation";
 import Home from "./pages/Home";
+import About from "./pages/About";
+import Tips from "./pages/Tips";
+import FAQ from "./pages/Faq";
 
 function App() {
   return (
@@ -23,6 +26,9 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/tips" element={<Tips />} />
+            <Route path="/faq" element={<FAQ />} />
 
             {/* Private Routes */}
             <Route
