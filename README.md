@@ -1,8 +1,8 @@
-# Backend Documentation
-Microservice Architecture
+# EcoTrack
 
-## Services:
+## Backend Micro-Services:
 - Auth Service (done)
 - Carbon Tracking Service (done)
 - Game Service (work in progress)
 - Profile Service (not yet)
+
