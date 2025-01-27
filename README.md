@@ -3,6 +3,6 @@
 ## Backend Micro-Services:
 - Auth Service (done)
 - Carbon Tracking Service (done)
-- Game Service (work in progress)
-- Profile Service (not yet)
+- Game Service (done)
+- Profile Service (work in progress)
 
