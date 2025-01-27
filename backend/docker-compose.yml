@@ -13,6 +13,7 @@ services:
     depends_on:
       - auth_service
       - carbon_tracking_service
+      - game_service
 
   carbon_tracking_service:
     build:
@@ -35,3 +36,15 @@ services:
       - "8001:8001"
     env_file:
       - ./auth_service/.env
+
+  game_service:
+    build:
+      context: ./game_service
+      dockerfile: Dockerfile
+    container_name: game_service
+    ports:
+      - "8003:8003"
+    env_file:
+      - ./game_service/.env
+    depends_on:
+      - auth_service
