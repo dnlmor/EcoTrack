@@ -1,10 +1,10 @@
 from app.config import settings
 from openai import OpenAI
 from app.services.carbon_service import calculate_carbon_footprint
+from app.utils.input_mapper import map_user_answers_to_structure
 
 # Initialize the OpenAI client
 client = OpenAI(api_key=settings.openai_api_key)
-
 
 def chat_with_sustainability_consultant(prompt: str) -> str:
     """
@@ -30,6 +30,7 @@ def generate_tailored_carbon_footprint_questions() -> list:
     prompt = """
     Create tailored questions to gather information about a user's carbon footprint. 
     Group questions into categories: Home Energy, Transportation, Diet, and Waste. Ensure conciseness and clarity.
+    Include sub-categories where relevant, and use a clear format for the questions.
     """
     response = chat_with_sustainability_consultant(prompt)
     return response.split("\n")  # Return questions as a list of strings
@@ -45,7 +46,12 @@ def process_user_answers_and_generate_result(user_answers: dict) -> dict:
     Returns:
         dict: A dictionary containing the carbon footprint breakdown and total.
     """
-    emissions = calculate_carbon_footprint(user_answers)
+    # Map user-friendly answers to structured format
+    structured_input = map_user_answers_to_structure(user_answers)
+
+    # Calculate emissions using the structured input
+    emissions = calculate_carbon_footprint(structured_input)
+
     if emissions.get("total", 0) < 0:
         raise ValueError("Invalid carbon footprint calculation. Total emissions cannot be negative.")
     return emissions
