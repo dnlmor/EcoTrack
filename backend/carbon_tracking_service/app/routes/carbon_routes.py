@@ -56,6 +56,11 @@ def submit_carbon_footprint(token: str, user_answers: dict, db: Session = Depend
 
         return {"carbon_footprint": emissions, "critique_and_tips": critique_and_tips}
 
+    except ValueError as ve:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Value error: {str(ve)}"
+        )
     except Exception as e:
         raise HTTPException(
             status_code=500,

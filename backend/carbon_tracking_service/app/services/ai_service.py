@@ -1,5 +1,6 @@
 from app.config import settings
 from openai import OpenAI
+from openai import APIError, APIConnectionError, RateLimitError, InvalidRequestError
 from app.services.carbon_service import calculate_carbon_footprint
 from app.utils.input_mapper import map_user_answers_to_structure
 
@@ -19,9 +20,16 @@ def chat_with_sustainability_consultant(prompt: str) -> str:
             model="gpt-4",
         )
         return response.choices[0].message.content.strip()
+    except APIError as e:
+        raise Exception(f"OpenAI API returned an API Error: {str(e)}")
+    except APIConnectionError as e:
+        raise Exception(f"Failed to connect to OpenAI API: {str(e)}")
+    except RateLimitError as e:
+        raise Exception(f"OpenAI API request exceeded rate limit: {str(e)}")
+    except InvalidRequestError as e:
+        raise Exception(f"Invalid request to OpenAI API: {str(e)}")
     except Exception as e:
         raise Exception(f"Error communicating with OpenAI API: {str(e)}")
-
 
 def generate_tailored_carbon_footprint_questions() -> list:
     """
@@ -34,7 +42,6 @@ def generate_tailored_carbon_footprint_questions() -> list:
     """
     response = chat_with_sustainability_consultant(prompt)
     return response.split("\n")  # Return questions as a list of strings
-
 
 def process_user_answers_and_generate_result(user_answers: dict) -> dict:
     """
@@ -54,8 +61,8 @@ def process_user_answers_and_generate_result(user_answers: dict) -> dict:
 
     if emissions.get("total", 0) < 0:
         raise ValueError("Invalid carbon footprint calculation. Total emissions cannot be negative.")
+    
     return emissions
-
 
 def generate_critique_and_tips(carbon_footprint: float) -> dict:
     """
@@ -65,10 +72,12 @@ def generate_critique_and_tips(carbon_footprint: float) -> dict:
         "Your carbon footprint is below average. Great job!" if carbon_footprint < 1000
         else "Your carbon footprint is above average. Focus on reducing high-impact areas."
     )
+    
     tips = {
         "home_energy": "Use energy-efficient appliances and consider renewable energy.",
         "transportation": "Carpool, use public transport, or switch to electric vehicles.",
         "diet": "Reduce meat consumption and embrace plant-based meals.",
         "waste": "Recycle more and reduce single-use plastics."
     }
+    
     return {"critique": critique, "tips": tips}

@@ -1,20 +1,30 @@
-# Use the official Python image as the base image
+# Use the official Python slim image
 FROM python:3.12-slim
 
-# Set the working directory inside the container
+# Set environment variables to minimize warnings and configure the app
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH="${PYTHONPATH}:/app"
+
+# Set the working directory
 WORKDIR /app
+
+# Install required system libraries for psycopg2 and general package compilation
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libpq-dev \
+    musl-dev \
+    build-essential && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy the requirements file into the container
 COPY requirements.txt .
 
-# Install dependencies (including Uvicorn and FastAPI)
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the entire application code into the container
+# Copy the application code
 COPY . .
-
-# Set environment variable for Python path (avoid potential issues with imports)
-ENV PYTHONPATH="${PYTHONPATH}:/app"
 
 # Expose the application port
 EXPOSE 8001

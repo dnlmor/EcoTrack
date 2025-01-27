@@ -2,9 +2,13 @@ fastapi
 uvicorn
 sqlalchemy
 psycopg2-binary
-pydantic
 python-jose
 passlib[bcrypt]
 pytest
 httpx
-psycopg2
+python-dotenv
+pydantic
+email-validator
+python-multipart
+pydantic-settings
+
