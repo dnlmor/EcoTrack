@@ -1,0 +1,484 @@
+{
+    "quiz_questions": [
+      {
+        "id": 1,
+        "category": "Climate Science",
+        "question": "Which greenhouse gas has the highest concentration in Earth's atmosphere?",
+        "options": ["Carbon dioxide", "Methane", "Water vapor", "Nitrous oxide"],
+        "correct_answer": "Water vapor",
+        "difficulty": "medium"
+      },
+      {
+        "id": 2,
+        "category": "Energy",
+        "question": "What percentage of global electricity production comes from renewable sources as of 2023?",
+        "options": ["15%", "29%", "38%", "45%"],
+        "correct_answer": "29%",
+        "difficulty": "medium"
+      },
+      {
+        "id": 3,
+        "category": "Waste Management",
+        "question": "How long does it take for a plastic bottle to decompose in a landfill?",
+        "options": ["100 years", "250 years", "450 years", "Never fully decomposes"],
+        "correct_answer": "450 years",
+        "difficulty": "medium"
+      },
+      {
+        "id": 4,
+        "category": "Transportation",
+        "question": "Which mode of transportation has the lowest carbon footprint per passenger mile?",
+        "options": ["Electric train", "Electric car", "Hybrid bus", "Electric scooter"],
+        "correct_answer": "Electric train",
+        "difficulty": "medium"
+      },
+      {
+        "id": 5,
+        "category": "Food Systems",
+        "question": "Which food item typically has the highest carbon footprint per kilogram?",
+        "options": ["Beef", "Cheese", "Pork", "Chicken"],
+        "correct_answer": "Beef",
+        "difficulty": "easy"
+      },
+      {
+        "id": 6,
+        "category": "Water Conservation",
+        "question": "How much water is typically used in a 10-minute shower?",
+        "options": ["20 gallons", "25 gallons", "30 gallons", "35 gallons"],
+        "correct_answer": "25 gallons",
+        "difficulty": "medium"
+      },
+      {
+        "id": 7,
+        "category": "Renewable Energy",
+        "question": "Which renewable energy source currently provides the most electricity globally?",
+        "options": ["Solar", "Wind", "Hydropower", "Geothermal"],
+        "correct_answer": "Hydropower",
+        "difficulty": "medium"
+      },
+      {
+        "id": 8,
+        "category": "Biodiversity",
+        "question": "What percentage of Earth's species are estimated to be at risk of extinction?",
+        "options": ["10%", "25%", "33%", "50%"],
+        "correct_answer": "25%",
+        "difficulty": "hard"
+      },
+      {
+        "id": 9,
+        "category": "Climate Policy",
+        "question": "What is the global temperature rise limit set by the Paris Agreement?",
+        "options": ["1.0°C", "1.5°C", "2.0°C", "2.5°C"],
+        "correct_answer": "1.5°C",
+        "difficulty": "easy"
+      },
+      {
+        "id": 10,
+        "category": "Energy Efficiency",
+        "question": "What percentage of home energy is typically lost through poorly insulated windows and doors?",
+        "options": ["10-15%", "15-20%", "25-30%", "30-35%"],
+        "correct_answer": "25-30%",
+        "difficulty": "medium"
+      },
+      {
+        "id": 11,
+        "category": "Ocean Conservation",
+        "question": "By what year is the ocean predicted to contain more plastic than fish by weight?",
+        "options": ["2040", "2045", "2050", "2055"],
+        "correct_answer": "2050",
+        "difficulty": "medium"
+      },
+      {
+        "id": 12,
+        "category": "Sustainable Living",
+        "question": "Which household appliance typically uses the most energy?",
+        "options": ["Refrigerator", "Washing machine", "Dishwasher", "Water heater"],
+        "correct_answer": "Water heater",
+        "difficulty": "medium"
+      },
+      {
+        "id": 13,
+        "category": "Climate Science",
+        "question": "What percentage of Earth's freshwater is frozen in glaciers?",
+        "options": ["50%", "60%", "70%", "80%"],
+        "correct_answer": "70%",
+        "difficulty": "hard"
+      },
+      {
+        "id": 14,
+        "category": "Waste Management",
+        "question": "What percentage of plastic ever produced has been recycled?",
+        "options": ["5%", "9%", "15%", "20%"],
+        "correct_answer": "9%",
+        "difficulty": "medium"
+      },
+      {
+        "id": 15,
+        "category": "Transportation",
+        "question": "How much does carpooling typically reduce personal carbon emissions?",
+        "options": ["25%", "50%", "75%", "90%"],
+        "correct_answer": "50%",
+        "difficulty": "medium"
+      },
+      {
+        "id": 16,
+        "category": "Energy",
+        "question": "What is the average lifespan of a solar panel?",
+        "options": ["15-20 years", "20-25 years", "25-30 years", "30-35 years"],
+        "correct_answer": "25-30 years",
+        "difficulty": "medium"
+      },
+      {
+        "id": 17,
+        "category": "Food Systems",
+        "question": "What percentage of global greenhouse gas emissions come from food production?",
+        "options": ["15%", "26%", "34%", "42%"],
+        "correct_answer": "26%",
+        "difficulty": "hard"
+      },
+      {
+        "id": 18,
+        "category": "Water Conservation",
+        "question": "How many gallons of water does it take to produce one pound of beef?",
+        "options": ["500", "1000", "1800", "2400"],
+        "correct_answer": "1800",
+        "difficulty": "hard"
+      },
+      {
+        "id": 19,
+        "category": "Renewable Energy",
+        "question": "Which country leads the world in solar power capacity?",
+        "options": ["USA", "China", "Germany", "Japan"],
+        "correct_answer": "China",
+        "difficulty": "medium"
+      },
+      {
+        "id": 20,
+        "category": "Biodiversity",
+        "question": "How many species go extinct every day?",
+        "options": ["50", "100", "150", "200"],
+        "correct_answer": "150",
+        "difficulty": "hard"
+      },
+      {
+        "id": 21,
+        "category": "Climate Policy",
+        "question": "What percentage of countries have net-zero emissions targets?",
+        "options": ["50%", "60%", "70%", "80%"],
+        "correct_answer": "70%",
+        "difficulty": "medium"
+      },
+      {
+        "id": 22,
+        "category": "Energy Efficiency",
+        "question": "How much energy can LED bulbs save compared to traditional incandescent bulbs?",
+        "options": ["50%", "60%", "75%", "90%"],
+        "correct_answer": "90%",
+        "difficulty": "easy"
+      },
+      {
+        "id": 23,
+        "category": "Ocean Conservation",
+        "question": "What percentage of the world's oxygen is produced by marine plants?",
+        "options": ["30%", "50%", "70%", "90%"],
+        "correct_answer": "70%",
+        "difficulty": "medium"
+      },
+      {
+        "id": 24,
+        "category": "Sustainable Living",
+        "question": "How much food is wasted globally each year?",
+        "options": ["20%", "33%", "40%", "50%"],
+        "correct_answer": "33%",
+        "difficulty": "medium"
+      },
+      {
+        "id": 25,
+        "category": "Climate Science",
+        "question": "What is the biggest contributor to sea level rise?",
+        "options": ["Ice sheet melt", "Glacier melt", "Thermal expansion", "Ocean currents"],
+        "correct_answer": "Thermal expansion",
+        "difficulty": "hard"
+      },
+      {
+        "id": 26,
+        "category": "Waste Management",
+        "question": "How long does it take for an aluminum can to decompose?",
+        "options": ["50 years", "100 years", "200 years", "500 years"],
+        "correct_answer": "200 years",
+        "difficulty": "medium"
+      },
+      {
+        "id": 27,
+        "category": "Transportation",
+        "question": "What percentage of global CO2 emissions comes from aviation?",
+        "options": ["2%", "3%", "4%", "5%"],
+        "correct_answer": "2%",
+        "difficulty": "hard"
+      },
+      {
+        "id": 28,
+        "category": "Energy",
+        "question": "What is the average payback period for home solar panel installation?",
+        "options": ["5-7 years", "7-9 years", "9-11 years", "11-13 years"],
+        "correct_answer": "7-9 years",
+        "difficulty": "medium"
+      },
+      {
+        "id": 29,
+        "category": "Food Systems",
+        "question": "How much water does it take to produce one almond?",
+        "options": ["0.5 gallon", "1.1 gallons", "1.5 gallons", "2.0 gallons"],
+        "correct_answer": "1.1 gallons",
+        "difficulty": "hard"
+      },
+      {
+        "id": 30,
+        "category": "Water Conservation",
+        "question": "What percentage of Earth's water is freshwater?",
+        "options": ["1%", "2.5%", "5%", "10%"],
+        "correct_answer": "2.5%",
+        "difficulty": "medium"
+      },
+      {
+        "id": 31,
+        "category": "Renewable Energy",
+        "question": "What is the efficiency rate of most commercial solar panels?",
+        "options": ["10-15%", "15-20%", "20-25%", "25-30%"],
+        "correct_answer": "15-20%",
+        "difficulty": "hard"
+      },
+      {
+        "id": 32,
+        "category": "Biodiversity",
+        "question": "How many known species exist on Earth?",
+        "options": ["1.2 million", "1.5 million", "1.8 million", "2.0 million"],
+        "correct_answer": "1.8 million",
+        "difficulty": "medium"
+      },
+      {
+        "id": 33,
+        "category": "Climate Policy",
+        "question": "What year did the Kyoto Protocol come into effect?",
+        "options": ["2001", "2003", "2005", "2007"],
+        "correct_answer": "2005",
+        "difficulty": "medium"
+      },
+      {
+        "id": 34,
+        "category": "Energy Efficiency",
+        "question": "What percentage of energy in an incandescent bulb is wasted as heat?",
+        "options": ["70%", "80%", "90%", "95%"],
+        "correct_answer": "90%",
+        "difficulty": "medium"
+      },
+      {
+        "id": 35,
+        "category": "Ocean Conservation",
+        "question": "How many marine species are threatened with extinction?",
+        "options": ["2,000", "3,000", "4,000", "5,000"],
+        "correct_answer": "3,000",
+        "difficulty": "hard"
+      },
+      {
+        "id": 36,
+        "category": "Sustainable Living",
+        "question": "How much can a programmable thermostat reduce energy bills?",
+        "options": ["5%", "10%", "15%", "20%"],
+        "correct_answer": "10%",
+        "difficulty": "medium"
+      },
+      {
+        "id": 37,
+        "category": "Climate Science",
+        "question": "What percentage of CO2 emissions are absorbed by the ocean?",
+        "options": ["15%", "25%", "30%", "40%"],
+        "correct_answer": "30%",
+        "difficulty": "hard"
+      },
+      {
+        "id": 38,
+        "category": "Waste Management",
+        "question": "How many times can glass be recycled?",
+        "options": ["Indefinitely", "10 times", "20 times", "50 times"],
+        "correct_answer": "Indefinitely",
+        "difficulty": "easy"
+      },
+      {
+        "id": 39,
+        "category": "Transportation",
+        "question": "What percentage of car trips are under 3 miles?",
+        "options": ["20%", "30%", "40%", "50%"],
+        "correct_answer": "40%",
+        "difficulty": "medium"
+      },
+      {
+        "id": 40,
+        "category": "Energy",
+        "question": "How much of the world's energy comes from fossil fuels?",
+        "options": ["60%", "70%", "80%", "90%"],
+        "correct_answer": "80%",
+        "difficulty": "medium"
+      },
+      {
+        "id": 41,
+        "category": "Food Systems",
+        "question": "What percentage of food waste occurs at the consumer level?",
+        "options": ["17%", "27%", "37%", "47%"],
+        "correct_answer": "37%",
+        "difficulty": "hard"
+      },
+      {
+        "id": 42,
+        "category": "Water Conservation",
+        "question": "How many gallons of water does a typical dishwasher use?",
+        "options": ["3", "6", "9", "12"],
+        "correct_answer": "6",
+        "difficulty": "medium"
+      },
+      {
+        "id": 43,
+        "category": "Renewable Energy",
+        "question": "What is the main component of solar panels?",
+        "options": ["Silicon", "Aluminum", "Copper", "Glass"],
+        "correct_answer": "Silicon",
+        "difficulty": "medium"
+      },
+      {
+        "id": 44,
+        "category": "Biodiversity",
+        "question": "How much of Earth's land is protected for conservation?",
+        "options": ["5%", "10%", "15%", "17%"],
+        "correct_answer": "15%",
+        "difficulty": "medium"
+      },
+      {
+        "id": 45,
+        "category": "Climate Policy",
+        "question": "How many countries signed the Paris Agreement?",
+        "options": ["165", "175", "185", "195"],
+        "correct_answer": "195",
+        "difficulty": "medium"
+      },
+      {
+        "id": 46,
+        "category": "Energy Efficiency",
+        "question": "What percentage of home energy use goes to heating and cooling?",
+        "options": ["30%", "40%", "50%", "60%"],
+        "correct_answer": "50%",
+        "difficulty": "medium"
+      },
+      {
+        "id": 47,
+        "category": "Climate Science",
+        "question": "What percentage of global warming is attributed to human activities?",
+        "options": ["50%", "70%", "95%", "100%"],
+        "correct_answer": "95%",
+        "difficulty": "hard"
+      },
+      {
+        "id": 48,
+        "category": "Waste Management",
+        "question": "What is the global recycling rate for aluminum cans?",
+        "options": ["30%", "50%", "60%", "70%"],
+        "correct_answer": "70%",
+        "difficulty": "medium"
+      },
+      {
+        "id": 49,
+        "category": "Renewable Energy",
+        "question": "Which country produces the highest percentage of its electricity from wind energy?",
+        "options": ["Germany", "Denmark", "USA", "China"],
+        "correct_answer": "Denmark",
+        "difficulty": "medium"
+      },
+      {
+        "id": 50,
+        "category": "Food Systems",
+        "question": "Which crop uses the most water to produce per kilogram?",
+        "options": ["Rice", "Wheat", "Almonds", "Soybeans"],
+        "correct_answer": "Rice",
+        "difficulty": "hard"
+      },
+      {
+        "id": 51,
+        "category": "Transportation",
+        "question": "What percentage of global greenhouse gas emissions is attributed to transportation?",
+        "options": ["10%", "15%", "20%", "25%"],
+        "correct_answer": "15%",
+        "difficulty": "medium"
+      },
+      {
+        "id": 52,
+        "category": "Sustainable Living",
+        "question": "What is the average lifespan of a reusable cloth bag?",
+        "options": ["50 uses", "100 uses", "200 uses", "500 uses"],
+        "correct_answer": "500 uses",
+        "difficulty": "medium"
+      },
+      {
+        "id": 53,
+        "category": "Water Conservation",
+        "question": "What is the most water-efficient method of irrigation?",
+        "options": ["Drip irrigation", "Sprinkler systems", "Flood irrigation", "Center pivot irrigation"],
+        "correct_answer": "Drip irrigation",
+        "difficulty": "easy"
+      },
+      {
+        "id": 54,
+        "category": "Biodiversity",
+        "question": "What percentage of the Amazon Rainforest has been deforested?",
+        "options": ["5%", "10%", "15%", "20%"],
+        "correct_answer": "20%",
+        "difficulty": "hard"
+      },
+      {
+        "id": 55,
+        "category": "Energy Efficiency",
+        "question": "How much energy can smart thermostats save on heating and cooling?",
+        "options": ["5%", "10%", "15%", "20%"],
+        "correct_answer": "15%",
+        "difficulty": "medium"
+      },
+      {
+        "id": 56,
+        "category": "Climate Science",
+        "question": "Which of the following is considered a negative feedback loop in climate change?",
+        "options": ["Melting ice caps", "Ocean acidification", "Increased vegetation growth", "Permafrost thaw"],
+        "correct_answer": "Increased vegetation growth",
+        "difficulty": "hard"
+      },
+      {
+        "id": 57,
+        "category": "Ocean Conservation",
+        "question": "What percentage of coral reefs are currently at risk of extinction?",
+        "options": ["30%", "50%", "70%", "90%"],
+        "correct_answer": "50%",
+        "difficulty": "medium"
+      },
+      {
+        "id": 58,
+        "category": "Renewable Energy",
+        "question": "What is the main challenge of solar and wind energy production?",
+        "options": ["High costs", "Intermittency", "Land requirements", "Maintenance"],
+        "correct_answer": "Intermittency",
+        "difficulty": "medium"
+      },
+      {
+        "id": 59,
+        "category": "Sustainable Living",
+        "question": "What is the average reduction in carbon emissions when switching to a plant-based diet?",
+        "options": ["10%", "20%", "30%", "50%"],
+        "correct_answer": "20%",
+        "difficulty": "medium"
+      },
+      {
+        "id": 60,
+        "category": "Waste Management",
+        "question": "What percentage of electronic waste is properly recycled worldwide?",
+        "options": ["10%", "17%", "25%", "30%"],
+        "correct_answer": "17%",
+        "difficulty": "medium"
+      }
+    ]
+  }

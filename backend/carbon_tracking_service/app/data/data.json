@@ -1,0 +1,112 @@
+{
+    "categories": {
+      "home_energy": {
+        "title": "Home Energy",
+        "description": "Questions about your household energy consumption",
+        "questions": [
+          {
+            "id": "electricity_bill",
+            "question": "What is your average monthly electricity bill in euros?",
+            "type": "number",
+            "unit": "EUR"
+          },
+          {
+            "id": "heating_type",
+            "question": "What type of heating system do you use?",
+            "type": "select",
+            "options": ["Gas", "Electric", "Oil", "Wood", "None"]
+          },
+          {
+            "id": "heating_usage",
+            "question": "How many months per year do you use heating?",
+            "type": "number",
+            "unit": "months"
+          }
+        ]
+      },
+      "transportation": {
+        "title": "Transportation",
+        "description": "Questions about your travel and commuting habits",
+        "questions": [
+          {
+            "id": "car_type",
+            "question": "What type of vehicle do you primarily use?",
+            "type": "select",
+            "options": ["Gasoline", "Diesel", "Hybrid", "Electric", "Public Transport"]
+          },
+          {
+            "id": "weekly_distance",
+            "question": "How many km do you drive per week?",
+            "type": "number",
+            "unit": "km"
+          },
+          {
+            "id": "flights_short",
+            "question": "How many short-haul flights (under 3 hours) do you take per year?",
+            "type": "number",
+            "unit": "flights"
+          },
+          {
+            "id": "flights_medium",
+            "question": "How many medium-haul flights (3-6 hours) do you take per year?",
+            "type": "number",
+            "unit": "flights"
+          },
+          {
+            "id": "flights_long",
+            "question": "How many long-haul flights (over 6 hours) do you take per year?",
+            "type": "number",
+            "unit": "flights"
+          }
+        ]
+      },
+      "diet": {
+        "title": "Diet",
+        "description": "Questions about your eating habits",
+        "questions": [
+          {
+            "id": "meat_days",
+            "question": "How many days per week do you eat meat?",
+            "type": "number",
+            "unit": "days"
+          },
+          {
+            "id": "dairy_consumption",
+            "question": "How would you describe your dairy consumption?",
+            "type": "select",
+            "options": ["High", "Medium", "Low", "None"]
+          },
+          {
+            "id": "local_food",
+            "question": "What percentage of your food is locally sourced (within 100 miles)?",
+            "type": "number",
+            "unit": "percentage"
+          }
+        ]
+      },
+      "waste": {
+        "title": "Waste",
+        "description": "Questions about your waste management",
+        "questions": [
+          {
+            "id": "waste_bags",
+            "question": "How many bags of garbage do you dispose of weekly?",
+            "type": "number",
+            "unit": "bags"
+          },
+          {
+            "id": "recycling",
+            "question": "What percentage of your waste do you recycle?",
+            "type": "number",
+            "unit": "percentage"
+          },
+          {
+            "id": "composting",
+            "question": "Do you compost organic waste?",
+            "type": "select",
+            "options": ["Yes", "Sometimes", "No"]
+          }
+        ]
+      }
+    }
+  }
