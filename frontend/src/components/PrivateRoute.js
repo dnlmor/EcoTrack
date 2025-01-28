@@ -1,16 +1,18 @@
-import React from "react";
-import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+// components/PrivateRoute.js
+import React from 'react';
+import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-const PrivateRoute = ({ children }) => {
+const PrivateRoute = () => {
   const { user } = useAuth();
-
-  // If user is not authenticated (no token or invalid token), redirect to login
-  if (!user) {
+  
+  if (!user || !user.token) {
+    // Redirect to login if there's no user or token
     return <Navigate to="/login" />;
   }
 
-  return children;
+  // If authenticated, render child route
+  return <Outlet />;
 };
 
 export default PrivateRoute;

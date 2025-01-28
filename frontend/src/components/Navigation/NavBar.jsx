@@ -19,7 +19,8 @@ const NavBar = () => {
     { to: '/carbon-tracking', label: 'Track Carbon' },
     { to: '/game', label: 'Eco Quiz' },
     { to: '/profile', label: 'Profile' },
-    { to: '/settings', label: 'Settings' }
+    { to: '/stats-dashboard', label: 'Stats' },
+    { to: '/settings', label: 'Settings' },
   ];
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);

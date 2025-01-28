@@ -1,6 +1,6 @@
 from app.config import settings
 from openai import OpenAI
-from openai import APIError, APIConnectionError, RateLimitError, InvalidRequestError
+from openai import APIError, APIConnectionError, RateLimitError, BadRequestError
 from app.services.carbon_service import calculate_carbon_footprint
 from app.utils.input_mapper import map_user_answers_to_structure
 
@@ -26,8 +26,8 @@ def chat_with_sustainability_consultant(prompt: str) -> str:
         raise Exception(f"Failed to connect to OpenAI API: {str(e)}")
     except RateLimitError as e:
         raise Exception(f"OpenAI API request exceeded rate limit: {str(e)}")
-    except InvalidRequestError as e:
-        raise Exception(f"Invalid request to OpenAI API: {str(e)}")
+    except BadRequestError as e:
+        raise Exception(f"Bad request to OpenAI API: {str(e)}")
     except Exception as e:
         raise Exception(f"Error communicating with OpenAI API: {str(e)}")
 
@@ -60,7 +60,7 @@ def process_user_answers_and_generate_result(user_answers: dict) -> dict:
     emissions = calculate_carbon_footprint(structured_input)
 
     if emissions.get("total", 0) < 0:
-        raise ValueError("Invalid carbon footprint calculation. Total emissions cannot be negative.")
+        raise ValueError("Bad carbon footprint calculation. Total emissions cannot be negative.")
     
     return emissions
 
