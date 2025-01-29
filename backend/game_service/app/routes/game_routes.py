@@ -1,4 +1,3 @@
-# game_routes.py
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.utils.token_utils import get_user_from_token
@@ -83,5 +82,34 @@ def submit_quiz(
         active_quizzes.pop(user.id, None)
         
         return full_results
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.get("/quiz/results")
+def get_user_highest_scores(token: str, db: Session = Depends(get_db)):
+    """Get the highest quiz score for each user"""
+    try:
+        user_email = get_user_from_token(token)
+        user = db.query(User).filter(User.email == user_email).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+            
+        # Query to get the highest score for each user
+        subquery = (
+            db.query(
+                Quiz.user_id,
+                db.func.max(Quiz.score).label("max_score")
+            )
+            .group_by(Quiz.user_id)
+            .subquery()
+        )
+            
+        highest_scores = (
+            db.query(Quiz)
+            .join(subquery, (Quiz.user_id == subquery.c.user_id) & (Quiz.score == subquery.c.max_score))
+            .all()
+        )
+            
+        return highest_scores
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

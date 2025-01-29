@@ -65,3 +65,19 @@ def submit_carbon_footprint(token: str, user_answers: dict, db: Session = Depend
             status_code=500,
             detail=f"Error processing submission: {str(e)}"
         )
+@router.get("/carbon-footprint/results")
+def get_carbon_footprint_results(token: str, db: Session = Depends(get_db)):
+    """Return all carbon footprint results for the authenticated user."""
+    try:
+        user_email = get_user_from_token(token)
+        user = db.query(User).filter(User.email == user_email).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        results = db.query(CarbonRecord).filter(CarbonRecord.user_id == user.id).all()
+        return {"results": [result.details for result in results]}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error retrieving results: {str(e)}"
+        )
