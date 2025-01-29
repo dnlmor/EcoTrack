@@ -14,19 +14,19 @@
 
 1. GET - /register
 
-    {
-    "username": "string",
-    "email": "user@example.com",
-    "password": "stringst",
-    }
+        {
+        "username": "string",
+        "email": "user@example.com",
+        "password": "stringst",
+        }
 
 
 2. POST - /login
 
-    {
-    "email": "user@example.com",
-    "password": "string"
-    }
+        {
+        "email": "user@example.com",
+        "password": "string"
+        }
 
 3. GET - /logout
 
@@ -36,30 +36,30 @@
 
 use token and get this:
 
-    {
-    "id": 0,
-    "username": "string",
-    "email": "user@example.com",
-    "full_name": "string",
-    "bio": "string",
-    "avatar_url": "string",
-    "phone_number": "string",
-    "email_verified": true,
-    "is_active": true
-    }
+        {
+        "id": 0,
+        "username": "string",
+        "email": "user@example.com",
+        "full_name": "string",
+        "bio": "string",
+        "avatar_url": "string",
+        "phone_number": "string",
+        "email_verified": true,
+        "is_active": true
+        }
 
 5. PUT - /me
 use token and input this:
 
-    {
-    "full_name": "string",
-    "bio": "string",
-    "avatar_url": "string",
-    "phone_number": "string",
-    "username": "string",
-    "email": "user@example.com",
-    "password": "stringst"
-    }
+        {
+        "full_name": "string",
+        "bio": "string",
+        "avatar_url": "string",
+        "phone_number": "string",
+        "username": "string",
+        "email": "user@example.com",
+        "password": "stringst"
+        }
 
 
 ### THE END ###
