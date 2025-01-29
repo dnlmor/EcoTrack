@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, aliased
+from sqlalchemy import func, and_
 from app.utils.token_utils import get_user_from_token
 from app.services.ai_service import QuizService
 from app.database import get_db
@@ -13,7 +14,8 @@ quiz_service = QuizService()
 # Store active quizzes
 active_quizzes = {}
 
-@router.post("/quiz/start")
+# Change POST to GET for starting a quiz
+@router.get("/quiz/start")
 def start_quiz(token: str, db: Session = Depends(get_db)):
     """Start a new quiz session"""
     try:
@@ -84,32 +86,51 @@ def submit_quiz(
         return full_results
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+
+
 @router.get("/quiz/results")
 def get_user_highest_scores(token: str, db: Session = Depends(get_db)):
-    """Get the highest quiz score for each user"""
+    """Get the highest quiz score for each user and list the top 5 unique users in descending order"""
     try:
         user_email = get_user_from_token(token)
         user = db.query(User).filter(User.email == user_email).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
-            
-        # Query to get the highest score for each user
-        subquery = (
+        
+        # Subquery to get the highest unique score for each user (by user_id)
+        highest_scores = (
             db.query(
                 Quiz.user_id,
-                db.func.max(Quiz.score).label("max_score")
+                func.max(Quiz.score).label("max_score")  # Get the highest score per user
             )
             .group_by(Quiz.user_id)
             .subquery()
         )
-            
-        highest_scores = (
+
+        # Main query to join quizzes with the subquery
+        top_scores = (
             db.query(Quiz)
-            .join(subquery, (Quiz.user_id == subquery.c.user_id) & (Quiz.score == subquery.c.max_score))
+            .join(
+                highest_scores,
+                and_(
+                    Quiz.user_id == highest_scores.c.user_id,
+                    Quiz.score == highest_scores.c.max_score
+                )
+            )
+            .order_by(Quiz.user_id, Quiz.timestamp.desc())  # Ensure ordering matches DISTINCT ON
+            .distinct(Quiz.user_id)  # Ensure one entry per user
+            .limit(5)  # Get top 5 users
             .all()
         )
-            
-        return highest_scores
+
+        # Format the top scores to match the expected output
+        leaderboard = [{
+            "quiz_id": score.id,
+            "user_id": score.user_id,
+            "username": score.username,
+            "total_score": score.score
+        } for score in top_scores]
+        
+        return leaderboard
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -1,21 +1,30 @@
-from fastapi import Request
-import logging
-from fastapi import Response
+from fastapi import Request, HTTPException
+from starlette.middleware.base import BaseHTTPMiddleware
+from ..utils.token_utils import verify_token
 
-logger = logging.getLogger(__name__)
+class AuthMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # Public paths that don't require authentication
+        public_paths = [
+            "/auth/login",
+            "/auth/register",
+            "/docs",
+            "/openapi.json"
+        ]
 
-async def auth_middleware(request: Request, call_next):
-    logger.debug(f"Auth middleware processing request: {request.url.path}")
-    try:
-        response = await call_next(request)
-        return response
-    except Exception as e:
-        logger.error(f"Error in auth middleware: {str(e)}", exc_info=True)
-        return Response(
-            content=str(e).encode(),
-            status_code=500,
-            headers={
-                "Access-Control-Allow-Origin": "http://localhost:3000",
-                "Access-Control-Allow-Credentials": "true"
-            }
-        )
+        if any(request.url.path.startswith(path) for path in public_paths):
+            return await call_next(request)
+
+        token = request.headers.get("Authorization")
+        
+        if not token or not token.startswith("Bearer "):
+            raise HTTPException(status_code=401, detail="Invalid token format")
+            
+        token = token.split(" ")[1]
+        payload = verify_token(token)
+        
+        if not payload:
+            raise HTTPException(status_code=401, detail="Invalid or expired token")
+            
+        request.state.user = payload
+        return await call_next(request)

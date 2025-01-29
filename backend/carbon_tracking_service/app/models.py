@@ -7,6 +7,8 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
+    username = Column(String, nullable=False)
+    
 class CarbonRecord(Base):
     __tablename__ = "carbon_records"
     id = Column(Integer, primary_key=True, index=True)

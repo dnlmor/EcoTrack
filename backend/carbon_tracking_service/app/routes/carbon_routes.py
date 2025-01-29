@@ -65,17 +65,42 @@ def submit_carbon_footprint(token: str, user_answers: dict, db: Session = Depend
             status_code=500,
             detail=f"Error processing submission: {str(e)}"
         )
+
 @router.get("/carbon-footprint/results")
 def get_carbon_footprint_results(token: str, db: Session = Depends(get_db)):
-    """Return all carbon footprint results for the authenticated user."""
+    """Return all carbon footprint results (total footprint) for the authenticated user, ordered by timestamp (latest first)."""
     try:
+        # Extract the user email from the token
         user_email = get_user_from_token(token)
+        
+        # Fetch the user from the database using email
         user = db.query(User).filter(User.email == user_email).first()
+        
+        # Handle case when user is not found
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
+        
+        # Query all carbon records for this user, sorted by timestamp (latest first)
+        results = db.query(CarbonRecord).filter(CarbonRecord.user_id == user.id).order_by(CarbonRecord.timestamp.desc()).all()
 
-        results = db.query(CarbonRecord).filter(CarbonRecord.user_id == user.id).all()
-        return {"results": [result.details for result in results]}
+        # If no results are found, return an appropriate message
+        if not results:
+            return {"message": "No carbon footprint results found for this user."}
+        
+        # Prepare the result data, including the username
+        response = [
+            {
+                "id": result.id,
+                "user_id": result.user_id,
+                "username": user.username,  # Include the username
+                "total": result.carbon_footprint,
+                "timestamp": result.timestamp.isoformat()  # Convert datetime to ISO format for JSON compatibility
+            }
+            for result in results
+        ]
+        
+        return {"results": response}
+        
     except Exception as e:
         raise HTTPException(
             status_code=500,

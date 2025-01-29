@@ -1,11 +1,8 @@
 fastapi
 uvicorn
-python-jose
+python-dotenv
 httpx
-python-multipart
+python-jose
 pydantic
 pydantic-settings
-python-dotenv
-PyJWT
-psutil
-cors
+passlib
