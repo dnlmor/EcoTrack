@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes.auth_routes import router as auth_router
+from app.routes.auth_routes import router
 from app.config import Base, engine
 
 # Initialize Database Tables
@@ -23,4 +23,4 @@ app.add_middleware(
 )
 
 # Include Routes
-app.include_router(auth_router, prefix="/auth", tags=["Authentication"])
+app.include_router(router, prefix="/auth", tags=["Authentication"])

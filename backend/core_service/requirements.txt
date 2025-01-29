@@ -1,4 +1,7 @@
 fastapi
 uvicorn
-python-dotenv
+python-jose
 httpx
+python-multipart
+pydantic
+python-dotenv
