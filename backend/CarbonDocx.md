@@ -149,8 +149,8 @@ use token and get this:
         }
 
 
-    2. POST - /carbon-footprint/submit
-    use token and input this format (this is just an example):
+2. POST - /carbon-footprint/submit
+use token and input this format (this is just an example):
 
         {
                 "home_energy": {
