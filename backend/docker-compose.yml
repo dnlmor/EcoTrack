@@ -1,8 +1,7 @@
 version: '3.8'
-
 services:
   core_service:
-    build: 
+    build:
       context: ./core_service
       dockerfile: Dockerfile
     ports:
@@ -10,9 +9,9 @@ services:
     env_file:
       - ./.env
     environment:
-      - AUTH_SERVICE_URL=http://localhost:8001
-      - CARBON_SERVICE_URL=http://localhost:8002
-      - GAME_SERVICE_URL=http://localhost:8003
+      SERVICE_URLS__auth: "http://auth_service:8001"
+      SERVICE_URLS__carbon: "http://carbon_tracking_service:8002"
+      SERVICE_URLS__game: "http://game_service:8003"
     depends_on:
       - auth_service
       - carbon_tracking_service

@@ -1,55 +1,73 @@
-from typing import Optional, Dict, Any
+# app/services/proxy_service.py
 from fastapi import Request, Response
-from app.utils.http_client import service_client
-from app.config import settings
+import httpx
+from typing import Optional
+import logging
+
+logger = logging.getLogger(__name__)
 
 class ProxyService:
-    @staticmethod
-    def get_service_url(service: str) -> str:
-        service_urls = {
-            "auth": settings.AUTH_SERVICE_URL,
-            "carbon": settings.CARBON_SERVICE_URL,
-            "game": settings.GAME_SERVICE_URL
+    def __init__(self):
+        self.service_urls = {
+            "auth": "http://localhost:8001",
+            "carbon": "http://localhost:8002",
+            "game": "http://localhost:8003"
         }
-        return service_urls.get(service, "")
 
-    @staticmethod
     async def forward_request(
+        self,
         request: Request,
         service: str,
         path: str,
         strip_path: Optional[str] = None
     ) -> Response:
-        # Get base URL for the service
-        service_url = ProxyService.get_service_url(service)
-        if not service_url:
-            raise ValueError(f"Invalid service: {service}")
+        target_url = f"{self.service_urls[service]}{path}"
+        logger.debug(f"Forwarding request to: {target_url}")
+        
+        try:
+            body = await request.body()
+            headers = dict(request.headers)
+            headers.pop('host', None)
+            
+            async with httpx.AsyncClient() as client:
+                response = await client.request(
+                    method=request.method,
+                    url=target_url,
+                    content=body,
+                    headers=headers,
+                    follow_redirects=True,
+                    timeout=30.0
+                )
+                
+                logger.debug(f"Received response from {service}: {response.status_code}")
+                
+                cors_headers = {
+                    "Access-Control-Allow-Origin": "http://localhost:3000",
+                    "Access-Control-Allow-Credentials": "true",
+                    "Access-Control-Allow-Methods": "*",
+                    "Access-Control-Allow-Headers": "*",
+                    "Access-Control-Expose-Headers": "Authorization"
+                }
+                
+                return Response(
+                    content=response.content,
+                    status_code=response.status_code,
+                    headers={**dict(response.headers), **cors_headers}
+                )
+                
+        except Exception as e:
+            logger.error(f"Error forwarding request to {service}: {str(e)}", exc_info=True)
+            return Response(
+                content=str(e).encode(),
+                status_code=500,
+                headers={
+                    "Access-Control-Allow-Origin": "http://localhost:3000",
+                    "Access-Control-Allow-Credentials": "true"
+                }
+            )
 
-        # Strip the prefix if provided
-        if strip_path and path.startswith(strip_path):
-            path = path[len(strip_path):]
-        
-        # Build target URL
-        target_url = f"{service_url}{path}"
-        
-        # Get request body if present
-        body = None
-        if request.method in ["POST", "PUT", "PATCH"]:
-            body = await request.json()
-        
-        # Forward the request
-        response = await service_client.forward_request(
-            method=request.method,
-            url=target_url,
-            headers=dict(request.headers),
-            params=dict(request.query_params),
-            json=body
-        )
-        
-        return Response(
-            content=response.content,
-            status_code=response.status_code,
-            headers=dict(response.headers)
-        )
-
+# Create instance at module level
 proxy_service = ProxyService()
+
+# Add to __all__ for explicit exports
+__all__ = ['proxy_service']

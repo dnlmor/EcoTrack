@@ -16,20 +16,39 @@ router = APIRouter()
 
 @router.post("/register", response_model=UserResponse)
 def register(user: UserCreate, db: Session = Depends(get_db)):
+    """
+    Register a new user.
+    Expected data:
+        - username: str
+        - email: EmailStr
+        - password: str
+    """
     return register_user(user, db)
 
 @router.post("/login", response_model=Token)
 def login(user: UserLogin, db: Session = Depends(get_db)):
+    """
+    Log in an existing user.
+    Expected data:
+        - email: EmailStr
+        - password: str
+    """
     authenticated_user = authenticate_user(user.email, user.password, db)
     return generate_user_token(authenticated_user)
 
 @router.post("/logout", status_code=status.HTTP_200_OK)
 def logout(token: str, db: Session = Depends(get_db)):
+    """
+    Log out a user by invalidating the token.
+    """
     logout_user(token, db)
     return {"detail": "Logout successful"}
 
 @router.get("/me", response_model=UserResponse)
 def get_current_user(token: str, db: Session = Depends(get_db)):
+    """
+    Get the current authenticated user's profile.
+    """
     payload = verify_access_token(token)
     if not payload:
         raise HTTPException(
@@ -50,6 +69,9 @@ def update_profile(
     token: str,
     db: Session = Depends(get_db)
 ):
+    """
+    Update the current user's profile.
+    """
     payload = verify_access_token(token)
     if not payload:
         raise HTTPException(

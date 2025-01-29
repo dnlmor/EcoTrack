@@ -4,4 +4,8 @@ python-jose
 httpx
 python-multipart
 pydantic
+pydantic-settings
 python-dotenv
+PyJWT
+psutil
+cors

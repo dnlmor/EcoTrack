@@ -1,50 +1,21 @@
-from fastapi import Request, HTTPException
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jose import jwt, JWTError
-from app.config import settings
+from fastapi import Request
+import logging
+from fastapi import Response
 
-security = HTTPBearer()
-
-async def verify_token(credentials: HTTPAuthorizationCredentials = security):
-    try:
-        payload = jwt.decode(
-            credentials.credentials,
-            settings.JWT_SECRET_KEY,
-            algorithms=[settings.ALGORITHM]
-        )
-        return payload
-    except JWTError:
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid authentication credentials"
-        )
+logger = logging.getLogger(__name__)
 
 async def auth_middleware(request: Request, call_next):
-    # List of paths that don't require authentication
-    public_paths = [
-        "/api/auth/login",
-        "/api/auth/register",
-        "/docs",
-        "/redoc",
-        "/openapi.json"
-    ]
-    
-    if request.url.path in public_paths:
-        return await call_next(request)
-    
-    if not request.headers.get("Authorization"):
-        raise HTTPException(
-            status_code=401,
-            detail="Authorization header missing"
-        )
-    
+    logger.debug(f"Auth middleware processing request: {request.url.path}")
     try:
-        credentials = HTTPAuthorizationCredentials(
-            scheme="Bearer",
-            credentials=request.headers["Authorization"].split(" ")[1]
-        )
-        await verify_token(credentials)
+        response = await call_next(request)
+        return response
     except Exception as e:
-        raise HTTPException(status_code=401, detail=str(e))
-    
-    return await call_next(request)
+        logger.error(f"Error in auth middleware: {str(e)}", exc_info=True)
+        return Response(
+            content=str(e).encode(),
+            status_code=500,
+            headers={
+                "Access-Control-Allow-Origin": "http://localhost:3000",
+                "Access-Control-Allow-Credentials": "true"
+            }
+        )
