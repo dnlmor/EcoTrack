@@ -1,53 +1,18 @@
 version: '3.8'
 
 services:
-  core_service:
-    build:
-      context: ./core_service
-      dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
-    environment:
-      - API_GATEWAY_PORT=8000
-      - AUTH_SERVICE_URL=http://auth_service:8001
-      - CARBON_SERVICE_URL=http://carbon_tracking_service:8002
-      - GAME_SERVICE_URL=http://game_service:8003
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-      - CORS_ORIGINS=${CORS_ORIGINS}
-      - ENV=development
-    depends_on:
-      - auth_service
-      - carbon_tracking_service
-      - game_service
-    networks:
-      - microservices_network
-    volumes:
-      - ./core_service:/app
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
   auth_service:
     build:
       context: ./auth_service
       dockerfile: Dockerfile
     ports:
       - "8001:8001"
-    environment:
-      - DATABASE_URL=${AUTH_DATABASE_URL}
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-      - CORS_ORIGINS=${CORS_ORIGINS}
+    env_file:
+      - ./auth_service/.env
     networks:
       - microservices_network
     volumes:
       - ./auth_service:/app
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8001/auth/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   carbon_tracking_service:
     build:
@@ -55,19 +20,12 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8002:8002"
-    environment:
-      - DATABASE_URL=${CARBON_DATABASE_URL}
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-      - CORS_ORIGINS=${CORS_ORIGINS}
+    env_file:
+      - ./carbon_tracking_service/.env
     networks:
       - microservices_network
     volumes:
       - ./carbon_tracking_service:/app
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8002/api/v1/carbon/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   game_service:
     build:
@@ -75,19 +33,12 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8003:8003"
-    environment:
-      - DATABASE_URL=${GAME_DATABASE_URL}
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-      - CORS_ORIGINS=${CORS_ORIGINS}
+    env_file:
+      - ./game_service/.env
     networks:
       - microservices_network
     volumes:
       - ./game_service:/app
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8003/game/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
 networks:
   microservices_network:
