@@ -1,8 +1,8 @@
 // services/authService.js
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8001";
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8001/auth";
 
 export const register = async (userData) => {
-  const response = await fetch(`${API_URL}/auth/register`, {
+  const response = await fetch(`${API_URL}/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -21,7 +21,7 @@ export const register = async (userData) => {
 };
 
 export const login = async (credentials) => {
-  const response = await fetch(`${API_URL}/auth/login`, {
+  const response = await fetch(`${API_URL}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -39,10 +39,9 @@ export const login = async (credentials) => {
 };
 
 export const logout = async (token) => {
-  const response = await fetch(`${API_URL}/auth/logout`, {
-    method: "POST",
+  const response = await fetch(`${API_URL}/logout`, { // Changed to GET as per AuthDocx.md
+    method: "GET",
     headers: { 
-      "Content-Type": "application/json",
       "Authorization": `Bearer ${token}`
     }
   });
@@ -50,6 +49,23 @@ export const logout = async (token) => {
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.detail || "Logout failed");
+  }
+
+  return response.json();
+};
+
+export const getCurrentUser = async (token) => {
+  const response = await fetch(`${API_URL}/me`, {
+    method: "GET",
+    headers: { 
+      "Authorization": `Bearer ${token}`
+    }
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json(); // Get detailed error information
+    console.error('Error fetching user data:', errorData); // Log detailed error
+    throw new Error(errorData.detail || "Failed to fetch user data");
   }
 
   return response.json();

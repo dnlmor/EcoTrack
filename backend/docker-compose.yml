@@ -1,44 +1,59 @@
 version: '3.8'
 
 services:
+  traefik:
+    image: traefik:v2.10
+    restart: always
+    command:
+      - "--api.insecure=true" # Enables the Traefik dashboard (for local dev)
+      - "--providers.docker=true" # Enables reading config from Docker labels
+      - "--entrypoints.web.address=:80" # Defines an entrypoint on port 80
+    ports:
+      - "80:80" # Exposes HTTP traffic
+      - "8080:8080" # Traefik Dashboard (optional)
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock" # Allows Traefik to see Docker services
+    networks:
+      - microservices_network
+
   auth_service:
     build:
       context: ./auth_service
       dockerfile: Dockerfile
-    ports:
-      - "8001:8001"
     env_file:
-      - ./auth_service/.env
+      - ./.env
     networks:
       - microservices_network
-    volumes:
-      - ./auth_service:/app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auth.rule=PathPrefix(`/auth`)"
+      - "traefik.http.services.auth.loadbalancer.server.port=8001"
 
   carbon_tracking_service:
     build:
       context: ./carbon_tracking_service
       dockerfile: Dockerfile
-    ports:
-      - "8002:8002"
     env_file:
-      - ./carbon_tracking_service/.env
+      - ./.env
     networks:
       - microservices_network
-    volumes:
-      - ./carbon_tracking_service:/app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.carbon.rule=PathPrefix(`/api/v1/carbon`)"
+      - "traefik.http.services.carbon.loadbalancer.server.port=8002"
 
   game_service:
     build:
       context: ./game_service
       dockerfile: Dockerfile
-    ports:
-      - "8003:8003"
     env_file:
-      - ./game_service/.env
+      - ./.env
     networks:
       - microservices_network
-    volumes:
-      - ./game_service:/app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.game.rule=PathPrefix(`/game`)"
+      - "traefik.http.services.game.loadbalancer.server.port=8003"
 
 networks:
   microservices_network:

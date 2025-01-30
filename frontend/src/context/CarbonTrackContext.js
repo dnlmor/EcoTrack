@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext } from "react";
-import { fetchCarbonQuestions, submitCarbonData, fetchLeaderboard } from "../services/carbonService";
+import { getCarbonQuestions, submitCarbonData, fetchCarbonFootprintResults } from "../services/carbonService";
 
 // Create a context for carbon tracking
 const CarbonTrackContext = createContext();
@@ -11,13 +11,13 @@ export const useCarbonTrack = () => {
 export const CarbonTrackProvider = ({ children }) => {
   const [questions, setQuestions] = useState([]);
   const [responses, setResponses] = useState({});
-  const [leaderboard, setLeaderboard] = useState([]);
+  const [tracklist, setTracklist] = useState([]); // Renamed leaderboard to tracklist
   const [error, setError] = useState(null);
 
   // Fetch questions from the API
   const loadQuestions = async () => {
     try {
-      const fetchedQuestions = await fetchCarbonQuestions();
+      const fetchedQuestions = await getCarbonQuestions();
       setQuestions(fetchedQuestions);
     } catch (err) {
       setError("Failed to load questions");
@@ -33,13 +33,13 @@ export const CarbonTrackProvider = ({ children }) => {
     }
   };
 
-  // Fetch the leaderboard
-  const loadLeaderboard = async () => {
+  // Fetch the tracklist (previously leaderboard) data
+  const loadTracklist = async (token) => {
     try {
-      const fetchedLeaderboard = await fetchLeaderboard();
-      setLeaderboard(fetchedLeaderboard);
+      const fetchedTracklist = await fetchCarbonFootprintResults(token);
+      setTracklist(fetchedTracklist.results || []); // Assuming 'results' field contains the tracklist data
     } catch (err) {
-      setError("Failed to load leaderboard");
+      setError("Failed to load tracklist");
     }
   };
 
@@ -49,11 +49,11 @@ export const CarbonTrackProvider = ({ children }) => {
         questions,
         responses,
         setResponses,
-        leaderboard,
+        tracklist, // Renamed from leaderboard to tracklist
         error,
         loadQuestions,
         submitData,
-        loadLeaderboard,
+        loadTracklist, // Updated method name to loadTracklist
       }}
     >
       {children}

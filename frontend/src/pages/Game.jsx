@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { startQuiz, submitQuizAnswers } from '../services/gameService';
+import { startQuiz, submitQuizAnswers, getUserHighestScores } from '../services/gameService';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import Alert from '../components/Alert';
@@ -15,6 +15,7 @@ const Game = () => {
   const [selectedAnswers, setSelectedAnswers] = useState([]);
   const [quizComplete, setQuizComplete] = useState(false);
   const [results, setResults] = useState(null);
+  const [leaderboard, setLeaderboard] = useState([]);
 
   useEffect(() => {
     const fetchQuiz = async () => {
@@ -26,12 +27,7 @@ const Game = () => {
           userId: data.user_id,
           questions: data.questions.map(q => ({
             question: q.question,
-            options: {
-              a: q.options.a,
-              b: q.options.b,
-              c: q.options.c,
-              d: q.options.d
-            }
+            options: q.options
           }))
         });
       } catch (err) {
@@ -46,19 +42,24 @@ const Game = () => {
   }, [user.token]);
 
   const handleAnswerSelect = async (answer) => {
-    const newAnswers = [...selectedAnswers, answer.toLowerCase()]; // Ensure lowercase
+    const newAnswers = [...selectedAnswers, answer];
     setSelectedAnswers(newAnswers);
-  
+
     if (currentQuestion + 1 < quizData.questions.length) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
       try {
         setLoading(true);
-  
-        // Submit the answers directly as a flat array
-        const results = await submitQuizAnswers(user.token, newAnswers);
-        setResults(results);
+        // Ensure answers are in the right format
+        const formattedAnswers = newAnswers.map(answer => answer.trim());
+        console.log("Submitting answers:", formattedAnswers);
+
+        const resultsData = await submitQuizAnswers(user.token, formattedAnswers);
+        setResults(resultsData);
         setQuizComplete(true);
+        
+        // Fetch leaderboard after quiz completion
+        await fetchLeaderboard();
       } catch (err) {
         setError(err.message);
       } finally {
@@ -66,7 +67,17 @@ const Game = () => {
       }
     }
   };
-  
+
+  const fetchLeaderboard = async () => {
+    try {
+      const scores = await getUserHighestScores(user.token);
+      console.log('Leaderboard data received:', scores);
+      setLeaderboard(scores); // Store leaderboard data
+    } catch (err) {
+      console.error('Leaderboard fetch error:', err);
+      setError(err.message);
+    }
+  };
 
   if (loading) {
     return (
@@ -85,18 +96,18 @@ const Game = () => {
   }
 
   return (
-    <div className="min-h-screen bg-green-50 py-12"> {/* Increased padding */}
-      <div className="max-w-3xl mx-auto px-6"> {/* Increased padding */}
+    <div className="min-h-screen bg-green-50 py-12">
+      <div className="max-w-3xl mx-auto px-6">
         {!quizComplete ? (
-          <Card variant="bordered" className="p-8 shadow-lg"> {/* Added shadow */}
-            <div className="mb-10"> {/* Increased margin */}
-              <div className="flex justify-between items-center mb-6"> {/* Increased margin */}
+          <Card variant="bordered" className="p-8 shadow-lg">
+            <div className="mb-10">
+              <div className="flex justify-between items-center mb-6">
                 <h2 className="text-3xl font-semibold text-green-800">Eco Quiz 🌍</h2>
-                <span className="text-green-600 text-lg"> {/* Increased text size */}
+                <span className="text-green-600 text-lg">
                   Question {currentQuestion + 1} of {quizData?.questions?.length || 0}
                 </span>
               </div>
-              <div className="h-3 bg-green-100 rounded-full"> {/* Increased height and full rounding */}
+              <div className="h-3 bg-green-100 rounded-full">
                 <div
                   className="h-full bg-green-500 rounded-full transition-all duration-300"
                   style={{
@@ -105,22 +116,22 @@ const Game = () => {
                 />
               </div>
             </div>
-  
+
             {quizData?.questions?.[currentQuestion] && (
-              <div className="space-y-8"> {/* Increased spacing */}
+              <div className="space-y-8">
                 <h3 className="text-2xl text-green-700 font-medium">
                   {quizData.questions[currentQuestion].question}
                 </h3>
-  
+
                 <div className="space-y-4">
-                  {Object.entries(quizData.questions[currentQuestion].options).map(([key, value]) => (
+                  {quizData.questions[currentQuestion].options.map((option, index) => (
                     <Button
-                      key={key}
+                      key={index}
                       variant="outline"
-                      className="w-full text-left justify-start py-5 px-6 text-lg hover:bg-green-50" /* Increased padding and text size */
-                      onClick={() => handleAnswerSelect(key)}
+                      className="w-full text-left justify-start py-5 px-6 text-lg hover:bg-green-50"
+                      onClick={() => handleAnswerSelect(option)}
                     >
-                      <span className="font-semibold mr-4 text-green-700">{key.toUpperCase()}.</span> {value}
+                      <span className="font-semibold mr-4 text-green-700">{option}</span>
                     </Button>
                   ))}
                 </div>
@@ -128,72 +139,85 @@ const Game = () => {
             )}
           </Card>
         ) : (
-          <Card variant="bordered" className="p-8 shadow-lg">
-            <h2 className="text-3xl font-bold text-green-800 mb-8">Quiz Results 📊</h2>
-            
-            <div className="bg-green-50 p-8 rounded-xl mb-10"> {/* Increased padding and margin */}
-              <p className="text-3xl font-semibold text-green-700 mb-6">
-                Score: {results?.score || 0}% {/* Fixed object access */}
-              </p>
-              <div className="space-y-3">
-                <p className="text-lg text-green-600">
-                  Correct Answers: {results?.correct_answers || 0}
+          <>
+            <Card variant="bordered" className="p-8 shadow-lg mb-6">
+              <h2 className="text-3xl font-bold text-green-800 mb-8">Quiz Results 📊</h2>
+
+              <div className="bg-green-50 p-8 rounded-xl mb-10">
+                <p className="text-3xl font-semibold text-green-700 mb-6">
+                  Score: {results?.quiz_details?.score || 0}%
                 </p>
-                <p className="text-lg text-green-600">
-                  Wrong Answers: {results?.wrong_answers || 0}
-                </p>
+                <div className="space-y-3">
+                  <p className="text-lg text-green-600">
+                    Correct Answers: {results?.quiz_details?.correct_answers || 0}
+                  </p>
+                  <p className="text-lg text-green-600">
+                    Wrong Answers: {results?.quiz_details?.wrong_answers || 0}
+                  </p>
+                </div>
               </div>
-            </div>
-  
-            <div className="space-y-8"> {/* Increased spacing */}
-              <div>
-                <h3 className="text-2xl font-semibold text-green-800 mb-4">
-                  Overall Assessment
-                </h3>
-                <p className="text-lg text-green-700">{results?.overall_assessment}</p>
-              </div>
-  
-              <div>
-                <h3 className="text-2xl font-semibold text-green-800 mb-4">Strengths</h3>
-                <ul className="list-disc pl-6 space-y-2">
-                  {results?.strengths?.map((strength, index) => (
-                    <li key={index} className="text-lg text-green-700">{strength}</li>
+
+              <div className="space-y-8">
+                <div>
+                  <h3 className="text-2xl font-semibold text-green-800 mb-4">Overall Assessment</h3>
+                  <p className="text-lg text-green-700">{results?.analysis?.overall_assessment}</p>
+                </div>
+
+                <div>
+                  <h3 className="text-2xl font-semibold text-green-800 mb-4">Strengths</h3>
+                  <ul className="list-disc pl-6 space-y-2">
+                    {(Array.isArray(results?.analysis?.strengths) ? results.analysis.strengths : []).map((strength, index) => (
+                      <li key={index} className="text-lg text-green-700">{strength}</li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-2xl font-semibold text-green-800 mb-4">Areas for Improvement</h3>
+                  <ul className="list-disc pl-6 space-y-2">
+                    {(Array.isArray(results?.analysis?.improvement_areas) ? results.analysis.improvement_areas : []).map((improvement, index) => (
+                      <li key={index} className="text-lg text-green-700">{improvement}</li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-2xl font-semibold text-green-800 mb-4">Learning Resources</h3>
+                  {Object.entries(results?.analysis?.learning_resources || {}).map(([topic, resource], index) => (
+                    <p key={index} className="text-lg text-green-700">{topic}: {resource}</p>
                   ))}
-                </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-xl font-semibold text-green-800 mb-4">Encouragement</h3>
+                  <p className="text-lg text-green-700">{results?.analysis?.encouragement}</p>
+                </div>
               </div>
-  
-              <div>
-                <h3 className="text-2xl font-semibold text-green-800 mb-4">
-                  Areas for Improvement
-                </h3>
-                <ul className="list-disc pl-6 space-y-2">
-                  {results?.improvements?.map((improvement, index) => (
-                    <li key={index} className="text-lg text-green-700">{improvement}</li>
-                  ))}
-                </ul>
-              </div>
-  
-              <div>
-                <h3 className="text-2xl font-semibold text-green-800 mb-4">
-                  Recommendations
-                </h3>
-                <ul className="list-disc pl-6 space-y-2">
-                  {results?.recommendations?.map((recommendation, index) => (
-                    <li key={index} className="text-lg text-green-700">{recommendation}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-  
-            <Button
-              variant="primary"
-              size="lg"
-              className="w-full mt-10 py-4 text-lg" /* Increased padding and text size */
-              onClick={() => window.location.reload()}
-            >
-              Try Another Quiz 🔄
-            </Button>
-          </Card>
+
+              <Button
+                variant="primary"
+                size="lg"
+                className="w-full mt-10 py-4 text-lg"
+                onClick={() => window.location.reload()}
+              >
+                Try Another Quiz 🔄
+              </Button>
+            </Card>
+
+            <Card variant="bordered" className="p-8 shadow-lg">
+              <h2 className="text-xl font-bold text-green-800 mb-4">Leaderboard 🏆</h2>
+              {leaderboard.length > 0 ? (
+                leaderboard.map((player, index) => (
+                  <div key={player.quiz_id} className={`flex justify-between py-2 ${index % 2 === 0 ? 'bg-gray-100' : ''}`}>
+                    <span>{index + 1}. {player.username}</span>
+                    <span>{player.total_score}%</span>
+                  </div>
+                ))
+              ) : (
+                <p>No leaderboard data available.</p>
+              )}
+            </Card>
+          </>
         )}
       </div>
     </div>

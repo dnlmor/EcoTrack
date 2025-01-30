@@ -1,3 +1,5 @@
+import Link from 'react-router-dom/Link';
+
 const AuthButtons = () => (
     <div className="flex items-center space-x-4">
       <Link to="/login" className="hover:text-green-200">

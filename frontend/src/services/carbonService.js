@@ -1,62 +1,62 @@
-// services/carbonService.js
+import axios from "axios";
+
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8002";
 
+// Fetch the carbon questions
 export const getCarbonQuestions = async (token) => {
   console.log('Making request to:', `${API_URL}/api/v1/carbon/carbon-footprint/start?token=${token}`); // Debug log
   try {
-    const response = await fetch(`${API_URL}/api/v1/carbon/carbon-footprint/start?token=${token}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+    const response = await axios.post(
+      `${API_URL}/api/v1/carbon/carbon-footprint/start?token=${token}`,
+      {},
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       }
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.detail || `Failed to fetch: ${response.status}`);
-    }
-
-    return response.json();
+    );
+    return response.data;
   } catch (error) {
-    console.error('Request error:', error); // Debug log
-    throw error;
+    console.error('Request error:', error);
+    throw error.response?.data || error;
   }
 };
 
+// Submit carbon data
 export const submitCarbonData = async (token, answers) => {
-  const response = await fetch(`${API_URL}/api/v1/carbon/carbon-footprint/submit?token=${token}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify(answers)
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.detail || 'Failed to submit data');
+  try {
+    const response = await axios.post(
+      `${API_URL}/api/v1/carbon/carbon-footprint/submit?token=${token}`,
+      answers,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Submission error:', error);
+    throw error.response?.data || error;
   }
-
-  return response.json();
 };
 
-// Adding the missing exports
-export const fetchCarbonQuestions = getCarbonQuestions; // Alias for backward compatibility
-
-export const fetchLeaderboard = async (token) => {
-  const response = await fetch(`${API_URL}/api/v1/carbon/leaderboard`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    }
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.detail || 'Failed to fetch leaderboard');
+// Fetch carbon footprint results
+export const fetchCarbonFootprintResults = async (token) => {
+  console.log("Requesting carbon footprint results with token:", token);  // Debug log
+  try {
+    const response = await axios.get(
+      `${API_URL}/api/v1/carbon/carbon-footprint/results?token=${token}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Request error:', error);  // Log the error
+    throw error.response?.data || error;
   }
-
-  return response.json();
 };

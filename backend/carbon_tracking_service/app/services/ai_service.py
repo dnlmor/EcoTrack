@@ -1,118 +1,105 @@
-# ai_service.py
-from typing import Dict, Any, Optional
-from openai import OpenAI
-from openai import APIError, APIConnectionError, RateLimitError, BadRequestError
 from app.config import settings
+from openai import OpenAI
+from app.services.carbon_service import calculate_carbon_footprint
 from app.utils.input_mapper import map_user_answers_to_structure
+from app.models import CarbonRecord
+from sqlalchemy.orm import Session
 
-class SustainabilityAI:
-    def __init__(self):
-        self.client = OpenAI(api_key=settings.openai_api_key)
+# Initialize the OpenAI client
+client = OpenAI(api_key=settings.openai_api_key)
 
-    def _call_ai(self, messages: list, max_tokens: Optional[int] = None) -> str:
-        """Base method to interact with OpenAI API"""
-        try:
-            params = {
-                "messages": messages,
-                "model": "gpt-4",
-            }
-            if max_tokens:
-                params["max_tokens"] = max_tokens
-
-            response = self.client.chat.completions.create(**params)
-            return response.choices[0].message.content.strip()
-        except (APIError, APIConnectionError, RateLimitError, BadRequestError) as e:
-            raise Exception(f"OpenAI API error: {str(e)}")
-        except Exception as e:
-            raise Exception(f"Error communicating with AI: {str(e)}")
-
-    def calculate_emissions(self, structured_input: Dict[str, Any]) -> dict:
-        """Calculate carbon emissions using AI"""
-        prompt = f"""
-        As a carbon emissions calculator, analyze this user data and provide precise calculations:
-        {structured_input}
-        
-        Calculate their annual carbon emissions in CO2e for each category:
-        1. Home Energy (based on electricity bill, heating type and usage)
-        2. Transportation (based on vehicle type, distance, and flights)
-        3. Diet (based on meat consumption, dairy usage, and local food percentage)
-        4. Waste (based on waste bags, recycling percentage, and composting habits)
-        
-        Provide the results in this exact format:
-        {{
-            "home_energy": [number],
-            "transportation": [number],
-            "diet": [number],
-            "waste": [number],
-            "total": [sum of all numbers],
-            "unit": "kg CO2e/year"
-        }}
-        
-        Be precise and realistic with the calculations. Return ONLY the JSON result, no explanations.
-        """
-        
-        try:
-            result = self._call_ai([
-                {"role": "system", "content": "You are a precise carbon footprint calculator that returns only JSON results."},
-                {"role": "user", "content": prompt}
-            ])
-            
-            # Convert string result to dict (assuming AI returns valid JSON)
-            import json
-            emissions = json.loads(result)
-            return emissions
-        except Exception as e:
-            raise Exception(f"Error calculating emissions: {str(e)}")
-
-    def analyze_footprint(self, emissions: dict) -> dict:
-        """Analyze emissions and provide recommendations"""
-        prompt = f"""
-        As a sustainability consultant, analyze these annual carbon emissions:
-        Home Energy: {emissions['home_energy']} kg CO2e
-        Transportation: {emissions['transportation']} kg CO2e
-        Diet: {emissions['diet']} kg CO2e
-        Waste: {emissions['waste']} kg CO2e
-        Total: {emissions['total']} kg CO2e
-
-        Provide analysis in this JSON format:
-        {{
-            "summary": "Brief overview of their carbon footprint compared to average",
-            "major_contributors": ["List top 2 contributing categories"],
-            "recommendations": [
-                {{
-                    "category": "Category name",
-                    "action": "Specific action",
-                    "potential_impact": "Estimated CO2e reduction"
-                }},
-                // 2 more recommendations
+def chat_with_sustainability_consultant(prompt: str) -> str:
+    """
+    Interact with the AI model to simulate a professional sustainability consultant.
+    """
+    try:
+        response = client.chat.completions.create(
+            messages=[
+                {"role": "system", "content": "You are a professional sustainability consultant."},
+                {"role": "user", "content": prompt},
             ],
-            "positive_habits": "One identified positive habit",
-            "reduction_goal": "Realistic 6-month reduction target"
-        }}
+            model="gpt-4",
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        raise Exception(f"Error communicating with OpenAI API: {str(e)}")
 
-        Return ONLY the JSON result, no explanations.
-        """
-        
-        try:
-            result = self._call_ai([
-                {"role": "system", "content": "You are a sustainability consultant that returns structured JSON analyses."},
-                {"role": "user", "content": prompt}
-            ])
-            
-            # Convert string result to dict
-            import json
-            analysis = json.loads(result)
-            return analysis
-        except Exception as e:
-            raise Exception(f"Error analyzing footprint: {str(e)}")
 
-    def process_user_data(self, user_answers: dict) -> dict:
-        """Process user answers and return both calculations and analysis"""
-        structured_input = map_user_answers_to_structure(user_answers)
-        emissions = self.calculate_emissions(structured_input)
-        analysis = self.analyze_footprint(emissions)
+def generate_tailored_carbon_footprint_questions() -> list:
+    """
+    Generate specific and concise questions for assessing the user's carbon footprint.
+    """
+    prompt = """
+    Create tailored questions to gather information about a user's carbon footprint. 
+    Group questions into categories: Home Energy, Transportation, Diet, and Waste. Ensure conciseness and clarity.
+    Include sub-categories where relevant, and use a clear format for the questions.
+    """
+    response = chat_with_sustainability_consultant(prompt)
+    return response.split("\n")  # Return questions as a list of strings
+
+
+def process_user_answers_and_generate_result(user_answers: dict) -> dict:
+    """
+    Process the user's answers, calculate their carbon footprint, and return the results.
+    Args:
+        user_answers (dict): User-provided answers to carbon footprint questions.
+    Returns:
+        dict: A dictionary containing the carbon footprint breakdown and total.
+    """
+    # Map user-friendly answers to structured format
+    structured_input = map_user_answers_to_structure(user_answers)
+    # Calculate emissions using the structured input
+    emissions = calculate_carbon_footprint(structured_input)
+    if emissions.get("total", 0) < 0:
+        raise ValueError("Invalid carbon footprint calculation. Total emissions cannot be negative.")
+    return emissions
+
+
+def generate_critique_and_tips(carbon_footprint: float) -> dict:
+    """
+    Provide concise critique and actionable tips based on the user's carbon footprint.
+    """
+    critique = (
+        "Your carbon footprint is below average. Great job!" if carbon_footprint < 1000
+        else "Your carbon footprint is above average. Focus on reducing high-impact areas."
+    )
+    tips = {
+        "home_energy": "Use energy-efficient appliances and consider renewable energy.",
+        "transportation": "Carpool, use public transport, or switch to electric vehicles.",
+        "diet": "Reduce meat consumption and embrace plant-based meals.",
+        "waste": "Recycle more and reduce single-use plastics."
+    }
+    return {"critique": critique, "tips": tips}
+
+
+def get_carbon_footprint_results(user_id: int, db: Session) -> dict:
+    """
+    Retrieve the carbon footprint results for the user from the database.
+    Args:
+        user_id (int): User's ID to fetch their results.
+        db (Session): Database session object.
+    Returns:
+        dict: A dictionary containing the user's carbon footprint results.
+    """
+    try:
+        # Fetch all carbon records for the user
+        results = db.query(CarbonRecord).filter(CarbonRecord.user_id == user_id).order_by(CarbonRecord.timestamp.desc()).all()
         
-        return {
-            "emissions": emissions,
-            "analysis": analysis
-        }
+        if not results:
+            return {"message": "No carbon footprint results found for this user."}
+        
+        # Prepare the results
+        response = [
+            {
+                "id": result.id,
+                "user_id": result.user_id,
+                "username": result.user.username,  # Include the username
+                "total": result.carbon_footprint,
+                "timestamp": result.timestamp.isoformat()  # Convert datetime to ISO format for JSON compatibility
+            }
+            for result in results
+        ]
+        
+        return {"results": response}
+    except Exception as e:
+        raise Exception(f"Error retrieving carbon footprint results: {str(e)}")

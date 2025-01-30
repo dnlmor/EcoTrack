@@ -1,6 +1,5 @@
-// context/AuthContext.js
 import React, { createContext, useState, useContext, useEffect } from "react";
-import { logout as logoutService } from "../services/authService";
+import { logout as logoutService, getCurrentUser } from "../services/authService";
 
 const AuthContext = createContext();
 
@@ -41,8 +40,22 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const fetchCurrentUser = async () => {
+    if (user?.token) {
+      try {
+        const currentUserData = await getCurrentUser(user.token);
+        setUser(prevState => ({
+          ...prevState,
+          ...currentUserData // Merge with existing user data
+        }));
+      } catch (error) {
+        console.error('Fetch current user error:', error);
+      }
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, fetchCurrentUser }}>
       {children}
     </AuthContext.Provider>
   );

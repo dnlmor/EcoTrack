@@ -10,7 +10,7 @@
 ***Core Service*** works as the API Gateway, therefore, the rest of the service are able to use the PORT 8000. 
 
 
-### game service routes: localhost:8000/game
+### game service routes: localhost:8003/game
 
 
 1. GET - /quiz/start
