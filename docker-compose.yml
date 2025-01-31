@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - microservices_network
+    volumes:
+      - ./frontend:/app
+
+  auth_service:
+    build:
+      context: ./backend/auth_service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    env_file:
+      - ./backend/.env
+    networks:
+      - microservices_network
+    volumes:
+      - ./backend/auth_service:/app
+
+  carbon_tracking_service:
+    build:
+      context: ./backend/carbon_tracking_service
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8002"
+    env_file:
+      - ./backend/.env
+    networks:
+      - microservices_network
+    volumes:
+      - ./backend/carbon_tracking_service:/app
+
+  game_service:
+    build:
+      context: ./backend/game_service
+      dockerfile: Dockerfile
+    ports:
+      - "8003:8003"
+    env_file:
+      - ./backend/.env
+    networks:
+      - microservices_network
+    volumes:
+      - ./backend/game_service:/app
+
+networks:
+  microservices_network:
+    driver: bridge
