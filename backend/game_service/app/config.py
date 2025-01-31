@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 60)
 
     class Config:
-        env_file = ".env"
+        env_file = ".env",
+        env_file_encoding = 'utf-8'
 
 settings = Settings()

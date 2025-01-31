@@ -1,4 +1,3 @@
-// components/Navigation/NavBar.jsx
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -9,17 +8,17 @@ const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const publicLinks = [
-    { to: '/about', label: 'About' },
+    { to: '/faq', label: 'FAQ' },
     { to: '/tips', label: 'Tips' },
-    { to: '/faq', label: 'FAQ' }
+    { to: '/about', label: 'About' },
   ];
 
   const privateLinks = [
     { to: '/dashboard', label: 'Dashboard' },
-    { to: '/carbon-tracking', label: 'Track Carbon' },
-    { to: '/game', label: 'Eco Quiz' },
+    { to: '/carbon-tracking', label: 'Track Emission' },
+    { to: '/stats-dashboard', label: 'Emission Stats' },
+    { to: '/game', label: 'EcoGame' },
     { to: '/profile', label: 'Profile' },
-    { to: '/stats-dashboard', label: 'Stats' },
     { to: '/settings', label: 'Settings' },
   ];
 
@@ -37,7 +36,7 @@ const NavBar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            {publicLinks.map((link) => (
+            {user && privateLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
@@ -46,7 +45,7 @@ const NavBar = () => {
                 {link.label}
               </Link>
             ))}
-            {user && privateLinks.map((link) => (
+            {publicLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
@@ -100,6 +99,16 @@ const NavBar = () => {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden py-4 space-y-2">
+            {user && privateLinks.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className="block py-2 hover:text-green-200 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
             {publicLinks.map((link) => (
               <Link
                 key={link.to}
@@ -110,21 +119,6 @@ const NavBar = () => {
                 {link.label}
               </Link>
             ))}
-            {user && (
-              <>
-                <div className="border-t border-green-600 my-2"></div>
-                {privateLinks.map((link) => (
-                  <Link
-                    key={link.to}
-                    to={link.to}
-                    className="block py-2 hover:text-green-200 transition-colors"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </>
-            )}
             <div className="border-t border-green-600 my-2"></div>
             {!user ? (
               <div className="space-y-2">

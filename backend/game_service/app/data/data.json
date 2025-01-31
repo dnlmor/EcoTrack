@@ -479,6 +479,166 @@
         "options": ["10%", "17%", "25%", "30%"],
         "correct_answer": "17%",
         "difficulty": "medium"
+      },
+      {
+        "id": 61,
+        "category": "Energy",
+        "question": "What is the main advantage of using nuclear energy?",
+        "options": ["Low cost", "No carbon emissions", "Abundant fuel supply", "Renewable resource"],
+        "correct_answer": "No carbon emissions",
+        "difficulty": "medium"
+      },
+      {
+        "id": 62,
+        "category": "Water Conservation",
+        "question": "How much water does it take to produce one pound of chicken?",
+        "options": ["500 gallons", "1,000 gallons", "2,000 gallons", "3,000 gallons"],
+        "correct_answer": "2,000 gallons",
+        "difficulty": "hard"
+      },
+      {
+        "id": 63,
+        "category": "Sustainable Living",
+        "question": "What is the carbon footprint of producing a cotton T-shirt?",
+        "options": ["2 kg CO2", "5 kg CO2", "10 kg CO2", "20 kg CO2"],
+        "correct_answer": "5 kg CO2",
+        "difficulty": "medium"
+      },
+      {
+        "id": 64,
+        "category": "Transportation",
+        "question": "What is the average fuel efficiency of an electric car in miles per kilowatt-hour (kWh)?",
+        "options": ["3-4 miles", "5-6 miles", "7-8 miles", "9-10 miles"],
+        "correct_answer": "3-4 miles",
+        "difficulty": "medium"
+      },
+      {
+        "id": 65,
+        "category": "Energy Efficiency",
+        "question": "What is the most energy-efficient appliance in a household?",
+        "options": ["Refrigerator", "Dishwasher", "Washing machine", "Air conditioner"],
+        "correct_answer": "Refrigerator",
+        "difficulty": "easy"
+      },
+      {
+        "id": 66,
+        "category": "Climate Science",
+        "question": "What is the primary cause of the ozone layer depletion?",
+        "options": ["Carbon dioxide", "Methane", "Chlorofluorocarbons (CFCs)", "Nitrous oxide"],
+        "correct_answer": "Chlorofluorocarbons (CFCs)",
+        "difficulty": "medium"
+      },
+      {
+        "id": 67,
+        "category": "Biodiversity",
+        "question": "Which of the following is an example of an invasive species?",
+        "options": ["Koala", "Lionfish", "Giant panda", "Sloth"],
+        "correct_answer": "Lionfish",
+        "difficulty": "easy"
+      },
+      {
+        "id": 68,
+        "category": "Renewable Energy",
+        "question": "What is the main disadvantage of geothermal energy?",
+        "options": ["High upfront costs", "Limited geographical availability", "Environmental impact", "Unreliable energy source"],
+        "correct_answer": "Limited geographical availability",
+        "difficulty": "medium"
+      },
+      {
+        "id": 69,
+        "category": "Water Conservation",
+        "question": "What is the primary reason for water scarcity in arid regions?",
+        "options": ["High population density", "Over-extraction of groundwater", "Pollution", "Drought"],
+        "correct_answer": "Over-extraction of groundwater",
+        "difficulty": "medium"
+      },
+      {
+        "id": 70,
+        "category": "Food Systems",
+        "question": "What is the main environmental impact of palm oil production?",
+        "options": ["Deforestation", "Soil erosion", "Water pollution", "Overfishing"],
+        "correct_answer": "Deforestation",
+        "difficulty": "hard"
+      },
+      {
+        "id": 71,
+        "category": "Energy",
+        "question": "What is the average efficiency of a coal power plant?",
+        "options": ["20%", "30%", "40%", "50%"],
+        "correct_answer": "30%",
+        "difficulty": "medium"
+      },
+      {
+        "id": 72,
+        "category": "Sustainable Living",
+        "question": "What is the primary benefit of using a clothesline instead of a dryer?",
+        "options": ["Lower energy bills", "Faster drying time", "More sanitary", "Better for fabric"],
+        "correct_answer": "Lower energy bills",
+        "difficulty": "easy"
+      },
+      {
+        "id": 73,
+        "category": "Climate Science",
+        "question": "What is the current concentration of carbon dioxide in the atmosphere?",
+        "options": ["350 ppm", "400 ppm", "450 ppm", "500 ppm"],
+        "correct_answer": "400 ppm",
+        "difficulty": "medium"
+      },
+      {
+        "id": 74,
+        "category": "Waste Management",
+        "question": "What is the largest source of global plastic waste?",
+        "options": ["Single-use packaging", "Textile waste", "Construction materials", "Industrial plastic waste"],
+        "correct_answer": "Single-use packaging",
+        "difficulty": "medium"
+      },
+      {
+        "id": 75,
+        "category": "Transportation",
+        "question": "Which type of vehicle is considered the most fuel-efficient in urban areas?",
+        "options": ["Electric car", "Hybrid car", "Bicycle", "Public transit"],
+        "correct_answer": "Bicycle",
+        "difficulty": "easy"
+      },
+      {
+        "id": 76,
+        "category": "Food Systems",
+        "question": "Which of the following foods has the lowest environmental impact?",
+        "options": ["Beef", "Lamb", "Tofu", "Pork"],
+        "correct_answer": "Tofu",
+        "difficulty": "easy"
+      },
+      {
+        "id": 77,
+        "category": "Energy Efficiency",
+        "question": "Which of the following is a common way to improve the energy efficiency of a home?",
+        "options": ["Add insulation", "Install larger windows", "Use more appliances", "Increase room temperature"],
+        "correct_answer": "Add insulation",
+        "difficulty": "easy"
+      },
+      {
+        "id": 78,
+        "category": "Biodiversity",
+        "question": "Which country has the largest number of endangered species?",
+        "options": ["Brazil", "China", "India", "USA"],
+        "correct_answer": "Brazil",
+        "difficulty": "hard"
+      },
+      {
+        "id": 79,
+        "category": "Waste Management",
+        "question": "What is the main environmental issue with e-waste?",
+        "options": ["Heavy metal contamination", "Plastic pollution", "Landfill overflow", "Air pollution"],
+        "correct_answer": "Heavy metal contamination",
+        "difficulty": "medium"
+      },
+      {
+        "id": 80,
+        "category": "Sustainable Living",
+        "question": "What is the average lifespan of a plastic bag?",
+        "options": ["10 years", "50 years", "100 years", "1000 years"],
+        "correct_answer": "1000 years",
+        "difficulty": "hard"
       }
     ]
   }

@@ -1,4 +1,7 @@
 from openai import OpenAI
+from sqlalchemy.orm import Session
+from sqlalchemy import func, and_
+from app.models.quiz_models import Quiz, User
 from app.config import settings
 import json
 import random
@@ -109,3 +112,28 @@ class QuizService:
                 "learning_resources": ["General sustainability resources"],
                 "encouragement": "Keep learning about sustainability!"
             }
+    
+    def get_top_5_users(self, db: Session) -> List[Dict[str, Any]]:
+        """Get the top 5 users based on their highest scores"""
+        try:
+            top_users = (
+                db.query(
+                    Quiz.user_id,
+                    func.max(Quiz.score).label("max_score")  # Get the highest score for each user
+                )
+                .group_by(Quiz.user_id)
+                .order_by(func.max(Quiz.score).desc())  # Order by score descending
+                .limit(5)  # Limit to top 5 users
+                .all()
+            )
+
+            # Format the result into the required structure
+            leaderboard = [{
+                "user_id": user_id,
+                "username": db.query(User.username).filter(User.id == user_id).first().username,
+                "total_score": max_score
+            } for user_id, max_score in top_users]
+            
+            return leaderboard
+        except Exception as e:
+            return {"error": str(e)}

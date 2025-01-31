@@ -90,47 +90,16 @@ def submit_quiz(
 
 @router.get("/quiz/results")
 def get_user_highest_scores(token: str, db: Session = Depends(get_db)):
-    """Get the highest quiz score for each user and list the top 5 unique users in descending order"""
+    """Get the top 5 highest quiz scores"""
     try:
         user_email = get_user_from_token(token)
         user = db.query(User).filter(User.email == user_email).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
-        
-        # Subquery to get the highest unique score for each user (by user_id)
-        highest_scores = (
-            db.query(
-                Quiz.user_id,
-                func.max(Quiz.score).label("max_score")  # Get the highest score per user
-            )
-            .group_by(Quiz.user_id)
-            .subquery()
-        )
 
-        # Main query to join quizzes with the subquery
-        top_scores = (
-            db.query(Quiz)
-            .join(
-                highest_scores,
-                and_(
-                    Quiz.user_id == highest_scores.c.user_id,
-                    Quiz.score == highest_scores.c.max_score
-                )
-            )
-            .order_by(Quiz.user_id, Quiz.timestamp.desc())  # Ensure ordering matches DISTINCT ON
-            .distinct(Quiz.user_id)  # Ensure one entry per user
-            .limit(5)  # Get top 5 users
-            .all()
-        )
+        # Get top 5 users based on their highest scores using QuizService
+        leaderboard = quiz_service.get_top_5_users(db)
 
-        # Format the top scores to match the expected output
-        leaderboard = [{
-            "quiz_id": score.id,
-            "user_id": score.user_id,
-            "username": score.username,
-            "total_score": score.score
-        } for score in top_scores]
-        
         return leaderboard
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

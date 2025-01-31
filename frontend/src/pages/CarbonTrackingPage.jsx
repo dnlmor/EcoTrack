@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getCarbonQuestions, submitCarbonData } from "../services/carbonService";
 import Card from "../components/Card";
@@ -10,232 +10,204 @@ import Alert from "../components/Alert";
 import Loader from "../components/Loader";
 
 const CarbonTrackingPage = () => {
- const { user } = useAuth();
- const [questions, setQuestions] = useState(null);
- const [userInput, setUserInput] = useState({
-   "Home Energy": {
-     "1": "", // electricity bill
-     "2": ""  // heating type
-   },
-   "Transportation": {
-     "1": "", // vehicle type
-     "3": "", // weekly distance
-     "4": "0", // short haul flights
-     "5": "0", // medium haul flights
-     "6": "0"  // long haul flights
-   },
-   "Diet": {
-     "1": "" // meat days per week
-   },
-   "Waste": {
-     "5": "" // bags per week
-   }
- });
- const [loading, setLoading] = useState(false);
- const [submitting, setSubmitting] = useState(false);
- const [error, setError] = useState(null);
- const [result, setResult] = useState(null);
+  const { user } = useAuth();
+  const navigate = useNavigate(); // Hook to navigate to another page
+  const [questions, setQuestions] = useState([]);
+  const [userInput, setUserInput] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+  const [result, setResult] = useState(null);
 
- useEffect(() => {
-   const fetchQuestions = async () => {
-     try {
-       setLoading(true);
-       const data = await getCarbonQuestions(user.token);
-       setQuestions(data.questions);
-     } catch (err) {
-       setError(err.message);
-     } finally {
-       setLoading(false);
-     }
-   };
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        setLoading(true);
+        const data = await getCarbonQuestions(user.token);
+        const fetchedQuestions = data.questions ? Object.values(data.questions) : [];
+        setQuestions(fetchedQuestions);
+        setUserInput(initializeInput(fetchedQuestions));  // Dynamically set initial input based on questions
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-   fetchQuestions();
- }, [user.token]);
+    fetchQuestions();
+  }, [user.token]);
 
- const handleInputChange = (category, field, value) => {
-   setUserInput(prev => ({
-     ...prev,
-     [category]: {
-       ...prev[category],
-       [field]: value + (field === "1" && category === "Home Energy" ? " kWh" : "")
-     }
-   }));
- };
+  // Initialize input state based on the structure of the questions
+  const initializeInput = (categories) => {
+    const input = {};
+    categories.forEach((category) => {
+      category.questions.forEach((question) => {
+        input[question.id] = question.type === "number" ? "" : "None";  // Initialize input values based on question type
+      });
+    });
+    return input;
+  };
 
- const handleSubmit = async () => {
-   try {
-     setSubmitting(true);
-     setError(null);
-     const data = await submitCarbonData(user.token, userInput);
-     setResult(data);
-   } catch (err) {
-     setError(err.message);
-   } finally {
-     setSubmitting(false);
-   }
- };
+  const handleInputChange = (questionId, value) => {
+    setUserInput(prev => ({
+      ...prev,
+      [questionId]: value,
+    }));
+  };
 
- if (loading) {
-   return (
-     <div className="min-h-screen bg-green-50 flex items-center justify-center">
-       <Loader size="lg" />
-     </div>
-   );
- }
+  const handleSubmit = async () => {
+    try {
+      setSubmitting(true);
+      setError(null);
+      const formattedData = formatSubmitData(userInput);
+      const data = await submitCarbonData(user.token, formattedData);
+      setResult(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
- return (
-   <div className="min-h-screen bg-green-50 py-8">
-     <div className="max-w-6xl mx-auto px-6">
-       <div className="flex justify-between items-center mb-10">
-         <h2 className="text-3xl font-semibold text-green-800">Carbon Footprint Tracker</h2>
-         <Link
-           to="/dashboard"
-           className="text-green-600 hover:text-green-700 flex items-center gap-2"
-         >
-           ← Back to Dashboard
-         </Link>
-       </div>
+  // Format the user input for submission based on the backend's required structure
+  const formatSubmitData = (input) => {
+    const formattedData = {
+      home_energy: {
+        electricity_bill: input["electricity_bill"],
+        heating_type: input["heating_type"],
+        heating_usage: input["heating_usage"],
+      },
+      transportation: {
+        car_type: input["car_type"],
+        weekly_distance: input["weekly_distance"],
+        flights: {
+          short_haul: input["flights_short"],
+          medium_haul: input["flights_medium"],
+          long_haul: input["flights_long"],
+        },
+      },
+      diet: {
+        meat_days: input["meat_days"],
+        dairy_consumption: input["dairy_consumption"],
+        local_food_percentage: input["local_food"],
+      },
+      waste: {
+        waste_bags: input["waste_bags"],
+        recycling_percentage: input["recycling"],
+        composting: input["composting"],
+      },
+    };
+    return formattedData;
+  };
 
-       {error && <Alert type="error" message={error} className="mb-6" />}
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-green-50 flex items-center justify-center">
+        <Loader size="lg" />
+      </div>
+    );
+  }
 
-       <div className="grid md:grid-cols-2 gap-10">
-         {/* Home Energy Card */}
-         <Card variant="bordered" className="p-8">
-           <h3 className="text-2xl text-green-700 mb-8">🏠 Home Energy</h3>
-           <div className="space-y-8">
-             <Input
-               label="Monthly Electricity Bill (kWh)"
-               type="number"
-               value={userInput["Home Energy"]["1"].replace(" kWh", "")}
-               onChange={(e) => handleInputChange("Home Energy", "1", e.target.value)}
-             />
-             <Select
-               label="Heating Type"
-               options={[
-                 { value: "Gas", label: "Natural Gas" },
-                 { value: "Electric", label: "Electric" },
-                 { value: "Oil", label: "Oil" },
-               ]}
-               value={userInput["Home Energy"]["2"]}
-               onChange={(e) => handleInputChange("Home Energy", "2", e.target.value)}
-             />
-           </div>
-         </Card>
+  return (
+    <div className="min-h-screen bg-green-50 py-6">
+      <div className="max-w-4xl mx-auto px-4">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-semibold text-green-800">Carbon Footprint Tracker</h2>
+          <Link to="/dashboard" className="text-green-600 hover:text-green-700 flex items-center gap-2 text-sm">← Back to Dashboard</Link>
+        </div>
 
-         {/* Transportation Card */}
-         <Card variant="bordered" className="p-8">
-           <h3 className="text-2xl text-green-700 mb-8">🚗 Transportation</h3>
-           <div className="space-y-8">
-             <Select
-               label="Vehicle Type"
-               options={[
-                 { value: "Gasoline", label: "Gasoline" },
-                 { value: "Diesel", label: "Diesel" },
-                 { value: "Hybrid", label: "Hybrid" },
-                 { value: "Electric", label: "Electric" },
-               ]}
-               value={userInput["Transportation"]["1"]}
-               onChange={(e) => handleInputChange("Transportation", "1", e.target.value)}
-             />
-             <Input
-               label="Weekly Distance (km)"
-               type="number"
-               value={userInput["Transportation"]["3"]}
-               onChange={(e) => handleInputChange("Transportation", "3", e.target.value)}
-             />
-             <Input
-               label="Short-haul Flights (per year)"
-               type="number"
-               value={userInput["Transportation"]["4"]}
-               onChange={(e) => handleInputChange("Transportation", "4", e.target.value)}
-             />
-             <Input
-               label="Medium-haul Flights (per year)"
-               type="number"
-               value={userInput["Transportation"]["5"]}
-               onChange={(e) => handleInputChange("Transportation", "5", e.target.value)}
-             />
-             <Input
-               label="Long-haul Flights (per year)"
-               type="number"
-               value={userInput["Transportation"]["6"]}
-               onChange={(e) => handleInputChange("Transportation", "6", e.target.value)}
-             />
-           </div>
-         </Card>
+        {error && <Alert type="error" message={error} className="mb-6" />}
 
-         {/* Diet Card */}
-         <Card variant="bordered" className="p-8">
-           <h3 className="text-2xl text-green-700 mb-8">🍽️ Diet</h3>
-           <Input
-             label="Meat Days per Week"
-             type="number"
-             value={userInput["Diet"]["1"]}
-             onChange={(e) => handleInputChange("Diet", "1", e.target.value)}
-           />
-         </Card>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {questions.length > 0 ? (
+            questions.map((category) => (
+              <Card key={category.title} variant="bordered" className="p-6">
+                <h3 className="text-xl text-green-700 mb-4">{category.title}</h3>
+                <p className="mb-6 text-sm text-green-600">{category.description}</p>
+                <div className="space-y-6">
+                  {category.questions && category.questions.map((question) => {
+                    const value = userInput[question.id];
+                    return (
+                      <div key={question.id}>
+                        {question.type === "number" ? (
+                          <Input
+                            label={question.question}
+                            type="number"
+                            value={value}
+                            onChange={(e) => handleInputChange(question.id, e.target.value)}
+                            placeholder={`Enter ${question.question.toLowerCase()} in ${question.unit}`}
+                            className="text-sm"
+                          />
+                        ) : (
+                          <Select
+                            label={question.question}
+                            options={question.options?.map(option => ({ value: option, label: option }))}
+                            value={value}
+                            onChange={(e) => handleInputChange(question.id, e.target.value)}
+                            className="text-sm"
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </Card>
+            ))
+          ) : (
+            <p>No questions available</p>  // Gracefully handle empty state
+          )}
+        </div>
 
-         {/* Waste Card */}
-         <Card variant="bordered" className="p-8">
-           <h3 className="text-2xl text-green-700 mb-8">🗑️ Waste</h3>
-           <Input
-             label="Bags of Waste per Week"
-             type="number"
-             value={userInput["Waste"]["5"]}
-             onChange={(e) => handleInputChange("Waste", "5", e.target.value)}
-           />
-         </Card>
-       </div>
+        <div className="mt-8 flex justify-center">
+          <Button onClick={handleSubmit} variant="primary" size="lg" className="px-8 py-3 text-lg" disabled={submitting}>
+            {submitting ? <Loader size="sm" /> : "Calculate Footprint 🌱"}
+          </Button>
+        </div>
 
-       <div className="mt-10 flex justify-center">
-         <Button
-           onClick={handleSubmit}
-           variant="primary"
-           size="lg"
-           className="px-12 py-4 text-lg"
-           disabled={submitting}
-         >
-           {submitting ? <Loader size="sm" /> : "Calculate Footprint 🌱"}
-         </Button>
-       </div>
+        {result && (
+          <Card variant="bordered" className="mt-8 p-6">
+            <h3 className="text-xl font-bold text-green-800 mb-6">Results 📊</h3>
+            <div className="bg-green-50 p-6 rounded-lg mb-6">
+              <p className="text-lg font-semibold text-green-700">Your Carbon Footprint: {result.emissions.total} kg CO₂e</p>
+              <div className="mt-4 space-y-2 text-sm text-green-600">
+                <p>Home Energy: {result.emissions.home_energy} kg CO₂e</p>
+                <p>Transportation: {result.emissions.transportation} kg CO₂e</p>
+                <p>Diet: {result.emissions.diet} kg CO₂e</p>
+                <p>Waste: {result.emissions.waste} kg CO₂e</p>
+              </div>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold text-green-800 mb-3">Recommendations 💡</h4>
+              <div className="space-y-3">
+                {result.analysis && (
+                  <>
+                    <p className="text-sm text-green-700">{result.analysis.summary}</p>
+                    <ul className="space-y-1 text-sm text-green-600">
+                      {result.analysis.recommendations && result.analysis.recommendations.map((recommendation, index) => (
+                        <li key={index} className="flex items-start">
+                          <span className="text-green-600 mr-2">•</span>
+                          <span className="text-green-700">{recommendation.action} ({recommendation.category}) - {recommendation.potential_impact}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+              </div>
+            </div>
+          </Card>
+        )}
 
-       {result && (
-         <Card variant="bordered" className="mt-10 p-8">
-           <h3 className="text-2xl font-bold text-green-800 mb-6">Results 📊</h3>
-           <div className="bg-green-50 p-6 rounded-lg mb-6">
-             <p className="text-xl font-semibold text-green-700">
-               Annual Carbon Footprint: {result.carbon_footprint.total} kg CO₂
-             </p>
-             <div className="mt-4 space-y-2">
-               <p className="text-green-600">Home Energy: {result.carbon_footprint.home_energy} kg CO₂</p>
-               <p className="text-green-600">Transportation: {result.carbon_footprint.transportation} kg CO₂</p>
-               <p className="text-green-600">Diet: {result.carbon_footprint.diet} kg CO₂</p>
-               <p className="text-green-600">Waste: {result.carbon_footprint.waste} kg CO₂</p>
-             </div>
-           </div>
-           <div>
-             <h4 className="text-lg font-semibold text-green-800 mb-3">Recommendations 💡</h4>
-             <div className="space-y-4">
-               {result.critique_and_tips && (
-                 <>
-                   <p className="text-green-700 font-medium">{result.critique_and_tips.critique}</p>
-                   <ul className="space-y-2">
-                     {Object.entries(result.critique_and_tips.tips).map(([category, tip]) => (
-                       <li key={category} className="flex items-start">
-                         <span className="text-green-600 mr-2">•</span>
-                         <span className="text-green-700">{tip}</span>
-                       </li>
-                     ))}
-                   </ul>
-                 </>
-               )}
-             </div>
-           </div>
-         </Card>
-       )}
-     </div>
-   </div>
- );
+        {/* Button to navigate to StatsDashboard, shown only when results are available */}
+        {result && (
+          <div className="mt-8 flex justify-center">
+            <Button onClick={() => navigate("/stats-dashboard")} variant="secondary" size="lg" className="px-8 py-3 text-lg">
+              View My Stats 📊
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default CarbonTrackingPage;

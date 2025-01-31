@@ -1,56 +1,44 @@
-// services/authService.js
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8001";
 
-export const register = async (userData) => {
-  const response = await fetch(`${API_URL}/auth/register`, {
+const fetchWithAuth = async (url, options = {}) => {
+  const response = await fetch(url, options);
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data.detail || `Request failed with status ${response.status}`);
+  }
+  return data;
+};
+
+export const register = async (userData) =>
+  fetchWithAuth(`${API_URL}/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      username: userData.username,
-      email: userData.email,
-      password: userData.password
-    })
+    body: JSON.stringify(userData),
   });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.detail || "Registration failed");
-  }
-
-  return response.json();
-};
-
-export const login = async (credentials) => {
-  const response = await fetch(`${API_URL}/auth/login`, {
+export const login = async (credentials) =>
+  fetchWithAuth(`${API_URL}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email: credentials.email,
-      password: credentials.password
-    })
+    body: JSON.stringify(credentials),
   });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.detail || "Invalid credentials");
-  }
-
-  return response.json();
-};
-
-export const logout = async (token) => {
-  const response = await fetch(`${API_URL}/auth/logout`, {
+export const logout = async (token) =>
+  fetchWithAuth(`${API_URL}/auth/logout`, {
     method: "POST",
-    headers: { 
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    }
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
   });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.detail || "Logout failed");
-  }
+export const getUserProfile = async (token) =>
+  fetchWithAuth(`${API_URL}/auth/me?token=${token}`, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${token}` },
+  });
 
-  return response.json();
-};
+export const updateUserProfile = async (token, updateData) =>
+  fetchWithAuth(`${API_URL}/auth/me?token=${token}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(updateData),
+  });

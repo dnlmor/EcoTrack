@@ -1,61 +1,45 @@
+// CarbonTrackContext.js
 import React, { createContext, useState, useContext } from "react";
-import { fetchCarbonQuestions, submitCarbonData, fetchLeaderboard } from "../services/carbonService";
+import { getCarbonQuestions, submitCarbonData, getCarbonResults } from "../services/carbonService";
 
-// Create a context for carbon tracking
 const CarbonTrackContext = createContext();
 
-export const useCarbonTrack = () => {
-  return useContext(CarbonTrackContext);
-};
+export const useCarbonTrack = () => useContext(CarbonTrackContext);
 
 export const CarbonTrackProvider = ({ children }) => {
   const [questions, setQuestions] = useState([]);
   const [responses, setResponses] = useState({});
-  const [leaderboard, setLeaderboard] = useState([]);
+  const [results, setResults] = useState([]);
   const [error, setError] = useState(null);
 
-  // Fetch questions from the API
-  const loadQuestions = async () => {
+  const loadQuestions = async (token) => {
     try {
-      const fetchedQuestions = await fetchCarbonQuestions();
-      setQuestions(fetchedQuestions);
+      const data = await getCarbonQuestions(token);
+      setQuestions(data.questions);
     } catch (err) {
-      setError("Failed to load questions");
+      setError(err.message);
     }
   };
 
-  // Submit the carbon data
-  const submitData = async () => {
+  const submitData = async (token) => {
     try {
-      await submitCarbonData(responses);
+      await submitCarbonData(token, responses);
     } catch (err) {
-      setError("Failed to submit data");
+      setError(err.message);
     }
   };
 
-  // Fetch the leaderboard
-  const loadLeaderboard = async () => {
+  const loadResults = async (token) => {
     try {
-      const fetchedLeaderboard = await fetchLeaderboard();
-      setLeaderboard(fetchedLeaderboard);
+      const data = await getCarbonResults(token);
+      setResults(data.results);
     } catch (err) {
-      setError("Failed to load leaderboard");
+      setError(err.message);
     }
   };
 
   return (
-    <CarbonTrackContext.Provider
-      value={{
-        questions,
-        responses,
-        setResponses,
-        leaderboard,
-        error,
-        loadQuestions,
-        submitData,
-        loadLeaderboard,
-      }}
-    >
+    <CarbonTrackContext.Provider value={{ questions, responses, setResponses, results, error, loadQuestions, submitData, loadResults }}>
       {children}
     </CarbonTrackContext.Provider>
   );
