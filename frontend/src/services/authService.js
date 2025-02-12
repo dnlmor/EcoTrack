@@ -24,11 +24,12 @@ export const login = async (credentials) =>
     body: JSON.stringify(credentials),
   });
 
-export const logout = async (token) =>
-  fetchWithAuth(`${API_URL}/auth/logout`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-  });
+  export const logout = async (token) =>
+    fetchWithAuth(`${API_URL}/auth/logout`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ token }),
+    });
 
 export const getUserProfile = async (token) =>
   fetchWithAuth(`${API_URL}/auth/me?token=${token}`, {

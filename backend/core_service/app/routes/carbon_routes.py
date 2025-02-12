@@ -1,27 +1,36 @@
-from fastapi import APIRouter, Request, Response
-from app.services.proxy_service import ProxyService
+from fastapi import APIRouter, Depends, HTTPException
+import requests
+from app.dependencies import get_current_user
+from app.utils.token_utils import decode_token
+from app.config import CARBON_TRACKING_SERVICE_URL
 
 router = APIRouter()
-proxy_service = ProxyService()
 
-@router.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
-async def carbon_proxy(request: Request, path: str):
-    method = request.method
-    headers = dict(request.headers)
-    params = dict(request.query_params)
-    body = await request.json() if method in ["POST", "PUT", "PATCH"] else None
-
-    response = await proxy_service.forward_request(
-        service="carbon",
-        path=f"/api/v1/carbon/{path}",
-        method=method,
-        headers=headers,
-        params=params,
-        data=body
-    )
+# Route to get carbon footprint data for a user
+@router.get("/carbon/footprint")
+async def get_carbon_footprint(token: str = Depends(get_current_user)):
+    user = decode_token(token)
     
-    return Response(
-        content=response.content,
-        status_code=response.status_code,
-        headers=dict(response.headers)
-    )
+    try:
+        response = requests.get(f"{CARBON_TRACKING_SERVICE_URL}/carbon/footprint", params={"user_id": user["id"]})
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=response.json())
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=500, detail=f"Error contacting carbon tracking service: {str(e)}")
+
+# Route to log carbon offset actions
+@router.post("/carbon/offset")
+async def log_carbon_offset(action_data: dict, token: str = Depends(get_current_user)):
+    user = decode_token(token)
+    
+    try:
+        response = requests.post(
+            f"{CARBON_TRACKING_SERVICE_URL}/carbon/offset", 
+            json={"action_data": action_data, "user_id": user["id"]}
+        )
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=response.json())
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=500, detail=f"Error contacting carbon tracking service: {str(e)}")

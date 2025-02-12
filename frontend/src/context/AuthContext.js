@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
         await logoutService(user.token);
       }
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error?.message || JSON.stringify(error));
     } finally {
       setUser(null);
     }

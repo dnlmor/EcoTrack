@@ -10,7 +10,6 @@ import CarbonTrackingPage from "./pages/CarbonTrackingPage";
 import PrivateRoute from "./components/PrivateRoute";
 import Game from "./pages/Game";
 import Settings from "./pages/Settings";
-import Navigation from "./components/Navigation";
 import NavBar from "./components/Navigation/NavBar";
 import Home from "./pages/Home";
 import About from "./pages/About";

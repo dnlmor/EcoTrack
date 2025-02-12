@@ -1,26 +1,20 @@
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
-from app.config import JWT_SECRET_KEY, ALGORITHM
-import requests
+from fastapi import Depends, HTTPException
+from .utils.token_utils import decode_token, get_user_from_token
+from sqlalchemy.orm import Session
+from .database import get_db
+import logging
 
-# OAuth2PasswordBearer instance for extracting the token from Authorization header
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+logger = logging.getLogger(__name__)
 
-def verify_token(token: str):
-    """
-    Verifies the JWT token and returns the decoded data if valid.
-    """
+# Dependency for token validation
+def get_current_user(token: str = Depends(get_user_from_token)):
     try:
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
-        return payload
-    except JWTError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        user = decode_token(token)
+        return user
+    except Exception as e:
+        logger.error(f"Token validation error: {str(e)}")
+        raise HTTPException(status_code=401, detail="Invalid token")
 
-# Dependency to verify JWT token and get user info
-def get_current_user(token: str = Depends(oauth2_scheme)):
-    return verify_token(token)
+# Dependency for shared database connection
+def get_db_connection(db: Session = Depends(get_db)):
+    return db

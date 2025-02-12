@@ -1,57 +1,46 @@
-import httpx
+import requests
 from fastapi import HTTPException
-from ..config import settings
-from typing import Dict, Any
+from app.config import USER_SERVICE_URL, GAME_SERVICE_URL, CARBON_TRACKING_SERVICE_URL
 
 class ProxyService:
-    def __init__(self):
-        self.client = httpx.AsyncClient(timeout=30.0)
-        self.service_urls = {
-            "auth": settings.auth_service_url,
-            "carbon": settings.carbon_service_url,
-            "game": settings.game_service_url
-        }
-
-    async def forward_request(
-        self,
-        service: str,
-        path: str,
-        method: str,
-        headers: Dict[str, str] = None,
-        data: Any = None,
-        params: Dict[str, str] = None
-    ):
-        if service not in self.service_urls:
-            raise HTTPException(status_code=404, detail="Service not found")
-
-        base_url = self.service_urls[service]
-        url = f"{base_url}{path}"
-        
-        # Extract token from Authorization header if present
-        token = None
-        if headers and "Authorization" in headers:
-            auth_header = headers["Authorization"]
-            if auth_header.startswith("Bearer "):
-                token = auth_header.split(" ")[1]
-                # Add token as query parameter for services that expect it
-                if params is None:
-                    params = {}
-                params["token"] = token
-
+    @staticmethod
+    def proxy_to_user_service(endpoint: str, method: str, data: dict = None):
+        url = f"{USER_SERVICE_URL}/{endpoint}"
         try:
-            response = await self.client.request(
-                method=method,
-                url=url,
-                headers=headers,
-                params=params,
-                json=data if method in ["POST", "PUT", "PATCH"] else None
-            )
-            return response
-        except httpx.RequestError as e:
-            raise HTTPException(status_code=503, detail=f"Service unavailable: {str(e)}")
-
-    async def close(self):
-        await self.client.aclose()
-
-# Create and export the instance
-proxy_service = ProxyService()
+            if method == "GET":
+                response = requests.get(url, params=data)
+            elif method == "POST":
+                response = requests.post(url, json=data)
+            if response.status_code != 200:
+                raise HTTPException(status_code=response.status_code, detail=response.json())
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            raise HTTPException(status_code=500, detail=f"Error contacting user service: {str(e)}")
+    
+    @staticmethod
+    def proxy_to_game_service(endpoint: str, method: str, data: dict = None):
+        url = f"{GAME_SERVICE_URL}/{endpoint}"
+        try:
+            if method == "GET":
+                response = requests.get(url, params=data)
+            elif method == "POST":
+                response = requests.post(url, json=data)
+            if response.status_code != 200:
+                raise HTTPException(status_code=response.status_code, detail=response.json())
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            raise HTTPException(status_code=500, detail=f"Error contacting game service: {str(e)}")
+    
+    @staticmethod
+    def proxy_to_carbon_tracking_service(endpoint: str, method: str, data: dict = None):
+        url = f"{CARBON_TRACKING_SERVICE_URL}/{endpoint}"
+        try:
+            if method == "GET":
+                response = requests.get(url, params=data)
+            elif method == "POST":
+                response = requests.post(url, json=data)
+            if response.status_code != 200:
+                raise HTTPException(status_code=response.status_code, detail=response.json())
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            raise HTTPException(status_code=500, detail=f"Error contacting carbon tracking service: {str(e)}")

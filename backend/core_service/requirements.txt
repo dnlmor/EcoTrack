@@ -1,8 +1,9 @@
 fastapi
 uvicorn
-python-dotenv
 httpx
-python-jose
 pydantic
-pydantic-settings
-passlib
+sqlalchemy
+psycopg2
+python-dotenv
+pyjwt
+loguru
